@@ -8,7 +8,6 @@ from api.main import api_router
 async def lifespan(app: FastAPI):
     await db.connect(app=app)
     yield
-    await db.disconnect(app=app)
 
 
 app = FastAPI(lifespan=lifespan)
