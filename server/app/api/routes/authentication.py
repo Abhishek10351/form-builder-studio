@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from pydantic import EmailStr, BaseModel, Field
 from datetime import timedelta
-from core.security import create_access_token
+from core.security import create_access_token, verify_password
 
 router = APIRouter(tags=["authentication"])
 
@@ -18,9 +18,9 @@ async def login(req: Request, user: UserAuth):
     email = user.email
     password = user.password
     users = req.app.mongodb["users"]
-    user = await users.find_one({"email": email, "password": password})
+    main_user = await users.find_one({"email": email})
 
-    if not user:
+    if not main_user or not verify_password(password, main_user["password"]):
         return {"message": "Invalid email or password"}, 401
 
     access_token = create_access_token(
