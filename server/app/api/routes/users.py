@@ -13,7 +13,6 @@ async def create_user(req: Request, user: User):
         user.password = get_password_hash(user.password)
         result = await collection.insert_one(user.model_dump())
         inserted_user = await collection.find_one({"_id": result.inserted_id})
-        del inserted_user["password"]
         return User(**inserted_user)
     except DuplicateKeyError:
         return Response(status_code=400, content="Email already exists")

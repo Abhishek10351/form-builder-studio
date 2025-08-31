@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Request, Response
 import time
 import uuid
 
-router = APIRouter()
-from fastapi.requests import Request
+router = APIRouter(tags=["utils"])
 
 
 @router.get("/ping", response_class=Response)
