@@ -1,4 +1,4 @@
-from auth import AuthMiddleware
+from .auth import AuthMiddleware
 
 
 __all__ = ["AuthMiddleware"]
