@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Response, status
 from models import User
 from pymongo.errors import DuplicateKeyError
 from core.security import get_password_hash
-
+from utils.auth import login_required, superuser_required
 router = APIRouter(prefix="/users", tags=["users"])
 
 
@@ -11,6 +11,7 @@ async def create_user(req: Request, user: User):
     try:
         collection = req.app.mongodb["users"]
         user.password = get_password_hash(user.password)
+        user.is_superuser = False
         result = await collection.insert_one(user.model_dump())
         inserted_user = await collection.find_one({"_id": result.inserted_id})
         return User(**inserted_user)
@@ -21,6 +22,7 @@ async def create_user(req: Request, user: User):
 
 
 @router.get("/", response_model=list[User], status_code=status.HTTP_200_OK)
+@superuser_required
 async def get_all_users(req: Request):
     collection = req.app.mongodb["users"]
     users = await collection.find().to_list(100)
