@@ -6,7 +6,9 @@ from models import User
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path in ["/login", "/signup"]:
+        # Skip auth for these paths
+        skip_paths = ["/login", "/users/create", "/docs", "/redoc", "/openapi.json"]
+        if request.url.path in skip_paths:
             return await call_next(request)
         auth_token = request.headers.get("Authorization")
         user = None

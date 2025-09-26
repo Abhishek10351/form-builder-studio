@@ -2,7 +2,8 @@ from fastapi import APIRouter, Request, Response, status
 from models import User
 from pymongo.errors import DuplicateKeyError
 from core.security import get_password_hash
-from utils.auth import superuser_required
+from utils.auth import login_required
+
 router = APIRouter(prefix="/users", tags=["users"])
 
 
@@ -16,14 +17,22 @@ async def create_user(req: Request, user: User):
         inserted_user = await collection.find_one({"_id": result.inserted_id})
         return User(**inserted_user)
     except DuplicateKeyError:
-        return Response(status_code=400, content="{'message': 'User with this email already exists'}", media_type="application/json")
+        return Response(
+            status_code=400,
+            content="{'message': 'User with this email already exists'}",
+            media_type="application/json",
+        )
     except Exception as e:
         return Response(status_code=500)
 
 
-@router.get("/", response_model=list[User], status_code=status.HTTP_200_OK)
-@superuser_required
-async def get_all_users(req: Request):
-    collection = req.app.mongodb["users"]
-    users = await collection.find().to_list(100)
-    return users
+@router.get("/me", status_code=status.HTTP_200_OK)
+@login_required
+async def get_me(req: Request):
+    user = req.state.user
+    # Convert to dict and remove password if it exists
+    user_dict = user.model_dump() if hasattr(user, "model_dump") else user
+    user_dict = user.model_dump()
+    if isinstance(user_dict, dict) and "password" in user_dict:
+        user_dict.pop("password")
+    return user_dict

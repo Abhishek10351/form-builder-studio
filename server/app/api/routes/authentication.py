@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Response
 from pydantic import EmailStr, BaseModel, Field
 from datetime import timedelta
 from core.security import create_access_token, verify_password
+import json
 
 router = APIRouter(tags=["authentication"])
 
@@ -43,7 +44,13 @@ async def login(req: Request, user: UserAuth):
 
     access_token = create_access_token(subject=email, expires_delta=timedelta(days=10))
 
+    response_data = {
+        "access": access_token,
+        "token_type": "bearer",
+        "expires": 10,
+    }
+
     return Response(
-        content=f'{{"access": "{access_token}", "token_type": "bearer", "expires": 10}}',
+        content=json.dumps(response_data),
         media_type="application/json",
     )
