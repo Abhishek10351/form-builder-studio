@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Response, status
 from models import User
 from pymongo.errors import DuplicateKeyError
 from core.security import get_password_hash
-from utils.auth import login_required, superuser_required
+from utils.auth import superuser_required
 router = APIRouter(prefix="/users", tags=["users"])
 
 
@@ -16,7 +16,7 @@ async def create_user(req: Request, user: User):
         inserted_user = await collection.find_one({"_id": result.inserted_id})
         return User(**inserted_user)
     except DuplicateKeyError:
-        return Response(status_code=400, content="Email already exists")
+        return Response(status_code=400, content="{'message': 'User with this email already exists'}", media_type="application/json")
     except Exception as e:
         return Response(status_code=500)
 

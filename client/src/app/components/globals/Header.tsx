@@ -57,11 +57,15 @@ const Header = () => {
                     <Button
                         variant="outline"
                         className="text-gray-600 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                        asChild
                     >
-                        Sign in
+                        <a href="/auth/login">Sign in</a>
                     </Button>
-                    <Button className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-200 shadow-md cursor-pointer">
-                        Start for free
+                    <Button
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-200 shadow-md cursor-pointer"
+                        asChild
+                    >
+                        <a href="/auth/signup">Create Account</a>
                     </Button>
                 </div>
                 <Sheet>
@@ -104,11 +108,15 @@ const Header = () => {
                                 <Button
                                     variant="outline"
                                     className="text-gray-600 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                                    asChild
                                 >
-                                    Sign in
+                                    <a href="/auth/login">Sign in</a>
                                 </Button>
-                                <Button className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-200 shadow-md cursor-pointer">
-                                    Start for free
+                                <Button
+                                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-200 shadow-md cursor-pointer"
+                                    asChild
+                                >
+                                    <a href="/auth/signup">Create Account</a>
                                 </Button>
                             </div>
                         </div>
