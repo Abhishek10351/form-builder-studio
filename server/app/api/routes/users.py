@@ -3,6 +3,7 @@ from models import User
 from pymongo.errors import DuplicateKeyError
 from core.security import get_password_hash
 from utils.auth import login_required
+import json
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -19,11 +20,15 @@ async def create_user(req: Request, user: User):
     except DuplicateKeyError:
         return Response(
             status_code=400,
-            content="{'message': 'User with this email already exists'}",
+            content=json.dumps({"message": "User with this email already exists"}),
             media_type="application/json",
         )
     except Exception as e:
-        return Response(status_code=500)
+        return Response(
+            status_code=500,
+            content=json.dumps({"message": "Internal server error"}),
+            media_type="application/json",
+        )
 
 
 @router.get("/me", status_code=status.HTTP_200_OK)

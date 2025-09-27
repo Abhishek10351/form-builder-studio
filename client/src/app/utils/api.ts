@@ -12,7 +12,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        const accessToken = cookies.get("access");
+        const accessToken = cookies.get("authToken");
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
@@ -22,4 +22,5 @@ api.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
 export default api;
