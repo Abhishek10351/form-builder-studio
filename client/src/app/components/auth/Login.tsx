@@ -2,55 +2,60 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useForm, FieldErrors } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import {
-    api,
-    LoginFormData,
-    validationRules,
-    submitForm,
-    redirectAfterDelay,
-} from "@/app/utils";
+    loginUser,
+    clearError,
+    fetchUserData,
+    type User,
+    type AuthState,
+} from "@/lib/redux/slices/authSlice";
+import { useEffect } from "react";
+import { validationRules, type LoginFormData } from "@/app/utils";
+import { AppDispatch, RootState } from "@/lib/redux/store";
 
-const Login = () => {
+const Login: React.FC = () => {
     const router = useRouter();
+    const dispatch: AppDispatch = useAppDispatch();
+    const { isLoading, error, isAuthenticated }: AuthState = useAppSelector(
+        (state: RootState) => state.auth
+    );
+
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors },
+    }: {
+        register: ReturnType<typeof useForm<LoginFormData>>["register"];
+        handleSubmit: ReturnType<typeof useForm<LoginFormData>>["handleSubmit"];
+        formState: { errors: FieldErrors<LoginFormData> };
     } = useForm<LoginFormData>();
 
-    const [submitError, setSubmitError] = useState<string | null>(null);
-    const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+    // Clear error when component mounts
+    useEffect(() => {
+        dispatch(clearError());
+    }, [dispatch]);
 
-    const onSubmit = async (data: LoginFormData) => {
-        setSubmitError(null);
-        setSubmitSuccess(false);
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.push("/dashboard");
+        }
+    }, [isAuthenticated, router]);
 
-        const result = await submitForm(
-            data,
-            (loginData) => api.post("/login", loginData),
-            "Login"
-        );
+    const onSubmit = async (data: LoginFormData): Promise<void> => {
+        const result = await dispatch(loginUser(data));
 
-        if (result.success) {
-            // Save the token in cookies
-            console.log(result.data);
+        if (loginUser.fulfilled.match(result)) {
+            // Fetch user data after successful login
+            await dispatch(fetchUserData());
 
-            if (result.data && result.data.access) {
-                const accessToken = result.data.access;
-                const expires = result.data.expires || 10;
-                Cookies.set("access", accessToken, { expires });
-                console.log("Token saved to cookies", expires);
-            }
-            setSubmitSuccess(true);
-            // Handle successful login here (store token, etc.)
-            // Redirect to dashboard after a short delay
-            redirectAfterDelay(router, "/", 1500);
-        } else {
-            setSubmitError(result.error);
+            // Redirect after successful login
+            setTimeout((): void => {
+                router.push("/dashboard");
+            }, 1500);
         }
     };
 
@@ -74,13 +79,14 @@ const Login = () => {
                         <form
                             onSubmit={handleSubmit(onSubmit)}
                             className="w-full flex flex-col gap-4"
+                            noValidate
                         >
-                            {submitError && (
+                            {error && (
                                 <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
-                                    {submitError}
+                                    {error}
                                 </div>
                             )}
-                            {submitSuccess && (
+                            {isAuthenticated && (
                                 <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md text-sm">
                                     Login successful! Redirecting to
                                     dashboard...
@@ -125,9 +131,9 @@ const Login = () => {
                             <Button
                                 type="submit"
                                 className="w-full mt-2 cursor-pointer"
-                                disabled={isSubmitting}
+                                disabled={isLoading}
                             >
-                                {isSubmitting ? "Logging in..." : "Login"}
+                                {isLoading ? "Logging in..." : "Login"}
                             </Button>
                         </form>
                     </div>

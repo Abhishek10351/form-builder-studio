@@ -3,46 +3,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-    api,
-    SignUpFormData,
-    validationRules,
-    submitForm,
-    redirectAfterDelay,
-} from "@/app/utils";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { signUpUser, clearError } from "@/lib/redux/slices/authSlice";
+import { useEffect, useState } from "react";
+import { validationRules, type SignUpFormData } from "@/app/utils";
 
 const SignUp = () => {
     const router = useRouter();
+    const dispatch = useAppDispatch();
+    const { isLoading, error } = useAppSelector((state) => state.auth);
+    const [signUpSuccess, setSignUpSuccess] = useState<boolean>(false);
+
     const {
         register,
         handleSubmit,
         watch,
-        formState: { errors, isSubmitting },
+        formState: { errors },
     } = useForm<SignUpFormData>();
 
     const password = watch("password");
-    const [submitError, setSubmitError] = useState<string | null>(null);
-    const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+
+    // Clear error when component mounts
+    useEffect(() => {
+        dispatch(clearError());
+    }, [dispatch]);
 
     const onSubmit = async (data: SignUpFormData) => {
-        setSubmitError(null);
-        setSubmitSuccess(false);
+        const result = await dispatch(signUpUser(data));
 
-        const result = await submitForm(
-            data,
-            (signUpData) => api.post("/users/create", signUpData),
-            "Sign up"
-        );
-
-        if (result.success) {
-            setSubmitSuccess(true);
-            // Handle successful sign up here
+        if (signUpUser.fulfilled.match(result)) {
+            setSignUpSuccess(true);
             // Redirect to login page after a short delay
-            redirectAfterDelay(router, "/auth/login", 2000);
-        } else {
-            setSubmitError(result.error);
+            setTimeout(() => {
+                router.push("/auth/login");
+            }, 2000);
         }
     };
 
@@ -67,12 +62,12 @@ const SignUp = () => {
                             onSubmit={handleSubmit(onSubmit)}
                             className="w-full flex flex-col gap-4"
                         >
-                            {submitError && (
+                            {error && (
                                 <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
-                                    {submitError}
+                                    {error}
                                 </div>
                             )}
-                            {submitSuccess && (
+                            {signUpSuccess && (
                                 <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md text-sm">
                                     Account created successfully! Redirecting to
                                     login page...
@@ -154,11 +149,9 @@ const SignUp = () => {
                             <Button
                                 type="submit"
                                 className="w-full mt-2 cursor-pointer"
-                                disabled={isSubmitting}
+                                disabled={isLoading}
                             >
-                                {isSubmitting
-                                    ? "Creating account..."
-                                    : "Sign Up"}
+                                {isLoading ? "Creating account..." : "Sign Up"}
                             </Button>
                         </form>
                     </div>
