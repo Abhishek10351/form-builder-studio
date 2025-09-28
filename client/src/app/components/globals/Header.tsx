@@ -17,9 +17,8 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { logout, type User } from "@/lib/redux/slices/authSlice";
+import { logout } from "@/lib/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
-import { AppDispatch, RootState } from "@/lib/redux/store";
 
 interface NavigationLink {
     title: string;
@@ -34,36 +33,26 @@ const navigationLinks: NavigationLink[] = [
 ];
 
 const Header: React.FC = () => {
-    const dispatch: AppDispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
     const router = useRouter();
-    const {
-        isAuthenticated,
-        user,
-    }: { isAuthenticated: boolean; user: User | null } = useAppSelector(
-        (state: RootState) => state.auth
-    );
+    const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
-    const handleLogout = (): void => {
+    const handleLogout = () => {
         dispatch(logout());
         router.push("/");
     };
 
     return (
-        <header className="bg-white shadow-sm py-4">
-            <nav className="container mx-auto px-6 flex justify-between items-center">
-                <a href="" className="flex items-center gap-2">
-                    {/* <img
-                        src=""
-                        className="max-h-8"
-                        alt=".."
-                    /> */}
+        <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm py-4 z-50 border-b border-gray-100">
+            <nav className="container mx-auto px-6 flex justify-between items-center h-12">
+                <a href="/" className="flex items-center gap-2">
                     <span className="text-lg font-semibold tracking-tighter">
                         Form Builder Studio
                     </span>
                 </a>
                 <NavigationMenu className="hidden lg:block">
                     <NavigationMenuList>
-                        {navigationLinks.map((link: NavigationLink) => (
+                        {navigationLinks.map((link) => (
                             <NavigationMenuItem key={link.title}>
                                 <NavigationMenuLink
                                     href={link.href}
@@ -117,16 +106,11 @@ const Header: React.FC = () => {
                     </SheetTrigger>
                     <SheetContent
                         side="top"
-                        className="max-h-screen overflow-auto"
+                        className="max-h-screen overflow-auto z-[60]"
                     >
                         <SheetHeader>
                             <SheetTitle>
-                                <a href="" className="flex items-center gap-2">
-                                    {/* <img
-                                        src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-icon.svg"
-                                        className="max-h-8"
-                                        alt="Shadcn UI Navbar"
-                                    /> */}
+                                <a href="/" className="flex items-center gap-2">
                                     <span className="text-lg font-semibold tracking-tighter">
                                         Form Builder Studio
                                     </span>
@@ -135,7 +119,7 @@ const Header: React.FC = () => {
                         </SheetHeader>
                         <div className="flex flex-col p-4">
                             <div className="flex flex-col gap-6">
-                                {navigationLinks.map((link: NavigationLink) => (
+                                {navigationLinks.map((link) => (
                                     <a
                                         key={link.title}
                                         href={link.href}

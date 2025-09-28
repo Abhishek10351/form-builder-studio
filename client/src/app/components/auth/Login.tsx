@@ -2,35 +2,27 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useForm, FieldErrors } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import {
     loginUser,
     clearError,
     fetchUserData,
-    type User,
-    type AuthState,
 } from "@/lib/redux/slices/authSlice";
 import { useEffect } from "react";
 import { validationRules, type LoginFormData } from "@/app/utils";
-import { AppDispatch, RootState } from "@/lib/redux/store";
 
 const Login: React.FC = () => {
     const router = useRouter();
-    const dispatch: AppDispatch = useAppDispatch();
-    const { isLoading, error, isAuthenticated }: AuthState = useAppSelector(
-        (state: RootState) => state.auth
+    const dispatch = useAppDispatch();
+    const { isLoading, error, isAuthenticated } = useAppSelector(
+        (state) => state.auth
     );
-
     const {
         register,
         handleSubmit,
         formState: { errors },
-    }: {
-        register: ReturnType<typeof useForm<LoginFormData>>["register"];
-        handleSubmit: ReturnType<typeof useForm<LoginFormData>>["handleSubmit"];
-        formState: { errors: FieldErrors<LoginFormData> };
     } = useForm<LoginFormData>();
 
     // Clear error when component mounts
@@ -45,17 +37,12 @@ const Login: React.FC = () => {
         }
     }, [isAuthenticated, router]);
 
-    const onSubmit = async (data: LoginFormData): Promise<void> => {
+    const onSubmit = async (data: LoginFormData) => {
         const result = await dispatch(loginUser(data));
 
         if (loginUser.fulfilled.match(result)) {
-            // Fetch user data after successful login
             await dispatch(fetchUserData());
-
-            // Redirect after successful login
-            setTimeout((): void => {
-                router.push("/dashboard");
-            }, 1500);
+            setTimeout(() => router.push("/dashboard"), 1500);
         }
     };
 
@@ -63,17 +50,6 @@ const Login: React.FC = () => {
         <section className="bg-muted h-screen">
             <div className="flex h-full items-center justify-center">
                 <div className="flex flex-col items-center gap-6 lg:justify-start">
-                    {/* Logo */}
-                    <a href={"/"} className="mb-4 hidden">
-                        <img
-                            src={
-                                "https://placehold.co/180x50?text=Form Builder Studio&font=roboto"
-                            }
-                            alt={"Logo"}
-                            title={"Form Builder Studio"}
-                            className="h10 dark:invert"
-                        />
-                    </a>
                     <div className="min-w-sm border-muted bg-background flex w-full max-w-sm flex-col items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
                         <h1 className="text-xl font-semibold">Login</h1>
                         <form
@@ -140,7 +116,7 @@ const Login: React.FC = () => {
                     <div className="text-muted-foreground flex justify-center gap-1 text-sm">
                         <p>Need an account?</p>
                         <a
-                            href={"/auth/signup"}
+                            href="/auth/signup"
                             className="text-primary font-medium hover:underline"
                         >
                             Sign up
