@@ -9,6 +9,7 @@ from pydantic import (
     HttpUrl,
     computed_field,
     model_validator,
+    MongoDsn,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self
@@ -24,13 +25,15 @@ def parse_cors(v: Any) -> list[str] | str:
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        # Use top level .env file (one level above ./backend/)
+        # Use .env file from server directory
         env_file="../.env",
         env_ignore_empty=True,
         extra="ignore",
     )
-    API_V1_STR: str = "/api/v1"
+    API_V1_STR: str = "/api/v1"  # Kept for future use, not applied to routes yet
     SECRET_KEY: str = secrets.token_urlsafe(40)
+    MONGODB_URI: MongoDsn = "mongodb://localhost:27017"
+    MONGODB_DB_NAME: str = "form_builder_studio"
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     FRONTEND_HOST: str = "http://localhost:3000"

@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from db import db
 from api.main import api_router
 import middleware
+from core.config import settings
 
 
 @asynccontextmanager
@@ -12,12 +13,16 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    lifespan=lifespan,
+    openapi_url="/openapi.json",
+)
 
 app.add_middleware(middleware.AuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.all_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
