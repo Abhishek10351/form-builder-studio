@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Form Builder Studio - Frontend
 
-## Getting Started
+Modern Next.js application providing an intuitive drag-and-drop form builder interface.
 
-First, run the development server:
+## About
+
+This frontend delivers a responsive, type-safe React application with form building capabilities, user authentication, and real-time preview functionality using the latest Next.js and React features.
+
+## Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Copy environment file and configure
+cp .env.example .env.local
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🌐 **Application**: <http://localhost:3000>  
+⚡ **Powered by**: Next.js 15 + Turbopack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- 📖 **[Detailed Setup Guide](./INSTALL.md)** - Complete installation instructions
+- 🏠 **[Main Project README](../README.md)** - Project overview and full documentation  
+- 🔧 **[Backend README](../server/README.md)** - API server setup
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js 15**: React framework with App Router
+- **React 19**: Latest React with concurrent features
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first styling
+- **Redux Toolkit**: Predictable state management
+- **Radix UI**: Accessible component primitives
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Key Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Drag-and-drop form builder (planned)
+- Real-time form preview
+- JWT authentication integration
+- Responsive design with dark mode
+- Server and client components
+- Type-safe API integration
 
-## Deploy on Vercel
+## Available Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` - Development server with Turbopack
+- `npm run build` - Production build
+- `npm run start` - Production server
+- `npm run lint` - Code linting
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```text
+client/
+├── src/
+│   ├── app/             # Next.js App Router
+│   │   ├── (auth)/     # Authentication pages
+│   │   └── dashboard/  # Main application
+│   ├── components/     # React components
+│   │   ├── ui/        # Base UI components
+│   │   └── forms/     # Form builder components
+│   ├── hooks/         # Custom React hooks
+│   ├── lib/           # Utilities and API client
+│   └── store/         # Redux store configuration
+├── public/            # Static assets
+└── INSTALL.md        # Detailed setup guide
+```
+
+## Contributing
+
+Please refer to the main project [README](../README.md) for contribution guidelines.
