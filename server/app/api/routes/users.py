@@ -23,7 +23,7 @@ async def create_user(req: Request, user: User):
             content=json.dumps({"message": "User with this email already exists"}),
             media_type="application/json",
         )
-    except Exception as e:
+    except Exception:
         return Response(
             status_code=500,
             content=json.dumps({"message": "Internal server error"}),
