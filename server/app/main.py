@@ -6,11 +6,11 @@ from api.main import api_router
 import middleware
 from core.config import settings
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await db.connect(app=app)
     yield
+    await db.disconnect(app=app)
 
 
 app = FastAPI(

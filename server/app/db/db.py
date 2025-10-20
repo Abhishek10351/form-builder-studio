@@ -13,5 +13,5 @@ async def connect(app: FastAPI) -> None:
 
 
 async def disconnect(app: FastAPI) -> None:
-    await app.mongo_client.close()
+    await app.mongo_client.aclose()
     print("Database disconnected")

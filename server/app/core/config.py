@@ -50,7 +50,7 @@ class Settings(BaseSettings):
             self.FRONTEND_HOST
         ]
 
-    PROJECT_NAME: str
+    PROJECT_NAME: str = "Form Builder Studio"
 
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False
