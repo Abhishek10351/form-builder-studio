@@ -1,12 +1,12 @@
 import FormField from "./InputField";
 import { Button } from "@/components/ui/button";
-import { FormFieldRendererProps } from "@/types";
+import { Form } from "@/types";
 
 export default function FormFieldRenderer({
     title,
     description,
     fields,
-}: FormFieldRendererProps) {
+}: Form) {
     return (
         <div className="max-w-2xl mx-auto p-6 min-h-screen mt-24 bg-background mb-12">
             <div className="mb-4 border-2 p-4 rounded-md">

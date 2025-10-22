@@ -32,10 +32,6 @@ export interface FormFieldProps {
     description?: string;
 }
 
-export interface FormFieldRendererProps extends Form {
-    onSubmit?: (data: Record<string, any>) => void;
-}
-
 // Utility types for better type safety
 export type FormFieldValue = string | boolean | string[] | Date | null;
 
