@@ -21,7 +21,7 @@ export interface Form {
     updatedAt?: string;
 }
 
-export interface InputBoxProps {
+export interface FormFieldProps {
     label: string;
     placeholder?: string;
     type?: FieldType;
