@@ -1,13 +1,12 @@
 "use client";
 
-import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
+import { useAppSelector } from "@/lib/redux/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
     const router = useRouter();
-    const dispatch = useAppDispatch();
     const { isAuthenticated, user, isLoading, token } = useAppSelector(
         (state) => state.auth
     );
@@ -57,7 +56,7 @@ export default function Dashboard() {
                                     Welcome Back!
                                 </h3>
                                 <p className="text-indigo-700">
-                                    Hello, {user?.name || "User"}! You're
+                                    Hello, {user?.name || "User"}! You&apos;re
                                     successfully logged in.
                                 </p>
                             </div>

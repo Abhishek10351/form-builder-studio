@@ -2,6 +2,7 @@
 
 import { MenuIcon, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
     NavigationMenu,
     NavigationMenuItem,
@@ -45,11 +46,11 @@ const Header: React.FC = () => {
     return (
         <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm py-4 z-50 border-b border-gray-100">
             <nav className="container mx-auto px-6 flex justify-between items-center h-12">
-                <a href="/" className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2">
                     <span className="text-lg font-semibold tracking-tighter">
                         Form Builder Studio
                     </span>
-                </a>
+                </Link>
                 <NavigationMenu className="hidden lg:block">
                     <NavigationMenuList>
                         {navigationLinks.map((link) => (
@@ -110,11 +111,14 @@ const Header: React.FC = () => {
                     >
                         <SheetHeader>
                             <SheetTitle>
-                                <a href="/" className="flex items-center gap-2">
+                                <Link
+                                    href="/"
+                                    className="flex items-center gap-2"
+                                >
                                     <span className="text-lg font-semibold tracking-tighter">
                                         Form Builder Studio
                                     </span>
-                                </a>
+                                </Link>
                             </SheetTitle>
                         </SheetHeader>
                         <div className="flex flex-col p-4">

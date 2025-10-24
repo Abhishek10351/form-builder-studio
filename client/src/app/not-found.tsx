@@ -35,10 +35,12 @@ const NotFound: React.FC = () => {
                         Page Not Found
                     </h1>
                     <p className="text-gray-600 text-lg mb-2">
-                        Oops! The page you're looking for doesn't exist.
+                        Oops! The page you&apos;re looking for doesn&apos;t
+                        exist.
                     </p>
                     <p className="text-gray-500">
-                        It might have been moved, deleted, or you entered the wrong URL.
+                        It might have been moved, deleted, or you entered the
+                        wrong URL.
                     </p>
                 </div>
 
@@ -52,7 +54,7 @@ const NotFound: React.FC = () => {
                         <ArrowLeft className="h-4 w-4" />
                         Go Back
                     </Button>
-                    
+
                     <Button
                         onClick={() => router.push("/")}
                         className="bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2"
@@ -107,8 +109,10 @@ const NotFound: React.FC = () => {
                 {/* Form Builder Studio Branding */}
                 <div className="mt-8 pt-6 border-t border-gray-200">
                     <p className="text-sm text-gray-500">
-                        <span className="font-semibold text-indigo-600">Form Builder Studio</span>
-                        {" "}- Build forms with ease
+                        <span className="font-semibold text-indigo-600">
+                            Form Builder Studio
+                        </span>{" "}
+                        - Build forms with ease
                     </p>
                 </div>
             </div>

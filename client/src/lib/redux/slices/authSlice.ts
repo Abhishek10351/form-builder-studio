@@ -50,10 +50,11 @@ export const loginUser = createAsyncThunk(
             Cookies.set("authToken", access, { expires: 10 });
 
             return { token: access, token_type };
-        } catch (error: any) {
+        } catch (error: unknown) {
             // Try different error message paths
             const errorMessage =
-                error.response?.data?.message || "Login failed";
+                (error as { response?: { data?: { message?: string } } })
+                    .response?.data?.message || "Login failed";
 
             return rejectWithValue(errorMessage);
         }
@@ -66,9 +67,10 @@ export const signUpUser = createAsyncThunk(
         try {
             const response = await api.post("/users/create", credentials);
             return response.data;
-        } catch (error: any) {
+        } catch (error: unknown) {
             const errorMessage =
-                error.response?.data?.message || "Registration failed";
+                (error as { response?: { data?: { message?: string } } })
+                    .response?.data?.message || "Registration failed";
             return rejectWithValue(errorMessage);
         }
     }
@@ -80,9 +82,10 @@ export const fetchUserData = createAsyncThunk(
         try {
             const response = await api.get("/users/me");
             return response.data;
-        } catch (error: any) {
+        } catch (error: unknown) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to fetch user data"
+                (error as { response?: { data?: { message?: string } } })
+                    .response?.data?.message || "Failed to fetch user data"
             );
         }
     }

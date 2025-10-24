@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { signUpUser, clearError } from "@/lib/redux/slices/authSlice";
 import { useEffect, useState } from "react";
 import { validationRules, type SignUpFormData } from "@/app/utils";
+import Image from "next/image";
 
 const SignUp = () => {
     const router = useRouter();
@@ -47,13 +48,15 @@ const SignUp = () => {
                 <div className="flex flex-col items-center gap-6 lg:justify-start">
                     {/* Logo */}
                     <a href={"/"} className="mb-4 hidden">
-                        <img
+                        <Image
                             src={
                                 "https://placehold.co/180x50?text=Form Builder Studio&font=roboto"
                             }
                             alt={"Logo"}
                             title={"Form Builder Studio"}
                             className="h10 dark:invert"
+                            width={180}
+                            height={50}
                         />
                     </a>
                     <div className="min-w-sm border-muted bg-background flex w-full max-w-sm flex-col items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
