@@ -23,6 +23,7 @@ export default function FormField({
     const renderInput = () => {
         switch (type) {
             case "text":
+            case "date":
                 return (
                     <Input
                         type={type}
@@ -30,16 +31,7 @@ export default function FormField({
                         required={required}
                         value={value as string}
                         onChange={(e) => onChange?.(e.target.value)}
-                    />
-                );
-            case "date":
-                return (
-                    <Input
-                        type="date"
-                        placeholder={placeholder}
-                        required={required}
-                        value={value as string}
-                        onChange={(e) => onChange?.(e.target.value)}
+                        className="border-0 border-b-2 border-gray-300 rounded-none p-2 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                     />
                 );
 

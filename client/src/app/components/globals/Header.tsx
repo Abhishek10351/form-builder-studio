@@ -20,6 +20,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { logout } from "@/lib/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface NavigationLink {
     title: string;
@@ -44,7 +45,7 @@ const Header: React.FC = () => {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm py-4 z-50 border-b border-gray-100">
+        <header className="fixed top-0 left-0 right-0 bg-background/95 backdrop-blur-sm shadow-sm py-4 z-50 border-b border-border">
             <nav className="container mx-auto px-6 flex justify-between items-center h-12">
                 <Link href="/" className="flex items-center gap-2">
                     <span className="text-lg font-semibold tracking-tighter">
@@ -67,15 +68,16 @@ const Header: React.FC = () => {
                 </NavigationMenu>
 
                 <div className="hidden items-center gap-4 lg:flex">
+                    <ThemeToggle />
                     {isAuthenticated ? (
                         <div className="flex items-center gap-4">
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-muted-foreground">
                                 Welcome, {user?.name || user?.email}
                             </span>
                             <Button
                                 variant="outline"
                                 onClick={handleLogout}
-                                className="text-gray-600 hover:text-red-600 transition-colors duration-200 cursor-pointer flex items-center gap-2"
+                                className="text-foreground hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2 "
                             >
                                 <LogOut className="h-4 w-4" />
                                 Sign out
@@ -85,13 +87,13 @@ const Header: React.FC = () => {
                         <>
                             <Button
                                 variant="outline"
-                                className="text-gray-600 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                                className="text-muted-foreground hover:text-primary transition-colors duration-200 cursor-pointer"
                                 asChild
                             >
                                 <a href="/auth/login">Sign in</a>
                             </Button>
                             <Button
-                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-200 shadow-md cursor-pointer"
+                                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
                                 asChild
                             >
                                 <a href="/auth/signup">Create Account</a>
@@ -133,16 +135,17 @@ const Header: React.FC = () => {
                                     </a>
                                 ))}
                             </div>
-                            <div className="mt-6 flex flex-col gap-4">
+                            <div className="mt-6 flex flex-col gap-4 items-st">
+                                <ThemeToggle />
                                 {isAuthenticated ? (
                                     <div className="flex flex-col gap-4">
-                                        <span className="text-sm text-gray-600">
+                                        <span className="text-sm text-muted-foreground">
                                             Welcome, {user?.name || user?.email}
                                         </span>
                                         <Button
                                             variant="outline"
                                             onClick={handleLogout}
-                                            className="text-gray-600 hover:text-red-600 transition-colors duration-200 cursor-pointer flex items-center gap-2"
+                                            className="text-muted-foreground hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2"
                                         >
                                             <LogOut className="h-4 w-4" />
                                             Sign out
@@ -152,13 +155,13 @@ const Header: React.FC = () => {
                                     <>
                                         <Button
                                             variant="outline"
-                                            className="text-gray-600 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                                            className="text-muted-foreground hover:text-primary transition-colors duration-200 cursor-pointer"
                                             asChild
                                         >
                                             <a href="/auth/login">Sign in</a>
                                         </Button>
                                         <Button
-                                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors duration-200 shadow-md cursor-pointer"
+                                            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
                                             asChild
                                         >
                                             <a href="/auth/signup">

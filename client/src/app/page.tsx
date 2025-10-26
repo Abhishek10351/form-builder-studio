@@ -16,7 +16,7 @@ const HomePage = async () => {
     const pageData = await getPageData();
 
     return (
-        <div className="bg-gray-50 text-gray-800">
+        <div className="bg-background text-foreground min-h-screen">
             <HeroSection />
             <FeaturesSection />
 

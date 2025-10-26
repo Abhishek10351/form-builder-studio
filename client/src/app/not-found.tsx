@@ -13,32 +13,32 @@ const NotFound: React.FC = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 pt-24 pb-8">
+        <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center px-4 pt-24 pb-8">
             <div className="max-w-md w-full text-center">
                 {/* 404 Animation/Illustration */}
                 <div className="mb-8">
                     <div className="relative">
-                        <div className="text-9xl font-bold text-indigo-600 mb-4 relative">
+                        <div className="text-9xl font-bold text-primary mb-4 relative">
                             4
                             <span className="inline-block transform rotate-12">
-                                <FileQuestion className="h-16 w-16 text-indigo-400 mx-4" />
+                                <FileQuestion className="h-16 w-16 text-primary/60 mx-4" />
                             </span>
                             4
                         </div>
-                        <div className="w-24 h-1 bg-indigo-600 mx-auto rounded-full animate-pulse"></div>
+                        <div className="w-24 h-1 bg-primary mx-auto rounded-full animate-pulse"></div>
                     </div>
                 </div>
 
                 {/* Error Message */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                    <h1 className="text-3xl font-bold text-foreground mb-4">
                         Page Not Found
                     </h1>
-                    <p className="text-gray-600 text-lg mb-2">
+                    <p className="text-muted-foreground text-lg mb-2">
                         Oops! The page you&apos;re looking for doesn&apos;t
                         exist.
                     </p>
-                    <p className="text-gray-500">
+                    <p className="text-muted-foreground">
                         It might have been moved, deleted, or you entered the
                         wrong URL.
                     </p>
@@ -57,7 +57,7 @@ const NotFound: React.FC = () => {
 
                     <Button
                         onClick={() => router.push("/")}
-                        className="bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2"
+                        className="bg-primary hover:bg-primary/90 flex items-center gap-2"
                     >
                         <Home className="h-4 w-4" />
                         Go Home
@@ -65,12 +65,12 @@ const NotFound: React.FC = () => {
                 </div>
 
                 {/* Additional Help */}
-                <div className="mt-8 p-4 bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                    <h3 className="font-semibold text-gray-900 mb-2 flex items-center justify-center gap-2">
+                <div className="mt-8 p-4 bg-card rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                    <h3 className="font-semibold text-foreground mb-2 flex items-center justify-center gap-2">
                         <Search className="h-4 w-4" />
                         What can you do?
                     </h3>
-                    <ul className="text-sm text-gray-600 space-y-1">
+                    <ul className="text-sm text-muted-foreground space-y-1">
                         <li>• Check the URL for typos</li>
                         <li>• Go back to the previous page</li>
                         <li>• Visit our homepage</li>
@@ -84,7 +84,7 @@ const NotFound: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => router.push("/dashboard")}
-                        className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                        className="text-primary hover:text-primary/90 hover:bg-primary/5"
                     >
                         Dashboard
                     </Button>
@@ -92,7 +92,7 @@ const NotFound: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => router.push("/auth/login")}
-                        className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                        className="text-primary hover:text-primary/90 hover:bg-primary/5"
                     >
                         Login
                     </Button>
@@ -100,16 +100,16 @@ const NotFound: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => router.push("/auth/signup")}
-                        className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                        className="text-primary hover:text-primary/90 hover:bg-primary/5"
                     >
                         Sign Up
                     </Button>
                 </div>
 
                 {/* Form Builder Studio Branding */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                    <p className="text-sm text-gray-500">
-                        <span className="font-semibold text-indigo-600">
+                <div className="mt-8 pt-6 border-t border-border">
+                    <p className="text-sm text-muted-foreground">
+                        <span className="font-semibold text-primary">
                             Form Builder Studio
                         </span>{" "}
                         - Build forms with ease
