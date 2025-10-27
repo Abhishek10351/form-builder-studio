@@ -122,3 +122,79 @@
         font-family: "Inter", sans-serif;
     }
 }
+
+/* Toggle Styles */
+:root {
+    --toggleHeight: 16em;
+    --toggleWidth: 30em;
+    --toggleBtnRadius: 10em;
+
+    /* Toggle Colors */
+    --toggle-bg-night: #423966;
+    --toggle-bg-day: #ffbf71;
+    --toggle-moon-color: #d9fbff;
+    --toggle-sun-color: #ffffff;
+    --toggle-star-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark {
+    /* Dark theme toggle colors */
+    --toggle-bg-night: #2d1b3d;
+    --toggle-bg-day: #e8a95b;
+    --toggle-moon-color: #c7e8ff;
+    --toggle-sun-color: #fefefe;
+    --toggle-star-color: rgba(255, 255, 255, 0.15);
+}
+
+.tdnn {
+    font-size: 30%; /* Scales the entire toggle */
+    height: var(--toggleHeight);
+    width: var(--toggleWidth);
+    border-radius: var(--toggleHeight);
+    transition: all 500ms ease-in-out;
+    background: var(--toggle-bg-night);
+}
+.tdnn.day {
+    background: var(--toggle-bg-day);
+}
+
+.toggle-btn {
+    transition: all 400ms ease-in-out;
+    width: var(--toggleBtnRadius);
+}
+
+.moon {
+    /* Position and appearance for the Moon */
+    top: 3em;
+    left: 3em;
+    transform: rotate(-75deg);
+    background: var(--toggle-bg-night);
+    box-shadow: 3em 2.5em 0 0em var(--toggle-moon-color) inset,
+        var(--toggle-star-color) 0em -7em 0 -4.5em,
+        var(--toggle-star-color) 3em 7em 0 -4.5em,
+        var(--toggle-star-color) 2em 13em 0 -4em,
+        var(--toggle-star-color) 6em 2em 0 -4.1em,
+        var(--toggle-star-color) 8em 8em 0 -4.5em,
+        var(--toggle-star-color) 6em 13em 0 -4.5em,
+        var(--toggle-star-color) -4em 7em 0 -4.5em,
+        var(--toggle-star-color) -1em 10em 0 -4.5em;
+}
+
+.sun {
+    /* Position and appearance for the Sun */
+    top: 4.5em;
+    left: 18em;
+    transform: rotate(0deg);
+    width: 7em;
+    height: 7em;
+    background: var(--toggle-sun-color);
+    box-shadow: 3em 3em 0 5em var(--toggle-sun-color) inset,
+        0 -5em 0 -2.7em var(--toggle-sun-color),
+        3.5em -3.5em 0 -3em var(--toggle-sun-color),
+        5em 0 0 -2.7em var(--toggle-sun-color),
+        3.5em 3.5em 0 -3em var(--toggle-sun-color),
+        0 5em 0 -2.7em var(--toggle-sun-color),
+        -3.5em 3.5em 0 -3em var(--toggle-sun-color),
+        -5em 0 0 -2.7em var(--toggle-sun-color),
+        -3.5em -3.5em 0 -3em var(--toggle-sun-color);
+}
