@@ -19,7 +19,7 @@ cp ../.env.example ../.env
 uv run python -m app.initial_data
 
 # Start development server
-cd app && fastapi dev main.py
+fastapi dev app/main.py
 ```
 
 🌐 **API Server**: <http://localhost:8000>  

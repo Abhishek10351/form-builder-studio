@@ -4,10 +4,10 @@ This guide will help you set up and run the Form Builder Studio backend API serv
 
 ## 📋 Prerequisites
 
--   **Python**: Version 3.12 or higher
--   **MongoDB**: Version 4.4 or higher (local or cloud instance)
--   **Git**: For cloning the repository
--   **uv**: Python package manager (recommended) or pip
+- **Python**: Version 3.12 or higher
+- **MongoDB**: Version 4.4 or higher (local or cloud instance)
+- **Git**: For cloning the repository
+- **uv**: Python package manager (recommended) or pip
 
 ## 🚀 Quick Start
 
@@ -93,9 +93,9 @@ brew services start mongodb/brew/mongodb-community
 
 **Windows:**
 
--   Download MongoDB Community Server from https://www.mongodb.com/try/download/community
--   Run the installer and follow the setup wizard
--   MongoDB will start automatically as a Windows service
+- Download MongoDB Community Server from <https://www.mongodb.com/try/download/community>
+- Run the installer and follow the setup wizard
+- MongoDB will start automatically as a Windows service
 
 #### MongoDB Cloud (MongoDB Atlas)
 
@@ -117,38 +117,35 @@ nano .env
 
 Required environment variables:
 
--   `MONGODB_URI` - Your MongoDB connection string
--   `SECRET_KEY` - Change from "changethis" to a secure random string
--   `FIRST_SUPERUSER` - Admin email address
--   `FIRST_SUPERUSER_PASSWORD` - Change from "changethis" to a secure password
-
-````
+- `MONGODB_URI` - Your MongoDB connection string
+- `SECRET_KEY` - Change from "changethis" to a secure random string
+- `FIRST_SUPERUSER` - Admin email address
+- `FIRST_SUPERUSER_PASSWORD` - Change from "changethis" to a secure password
 
 ### 5. Start Development Server
 
 ```bash
-# Navigate to app directory and start server
-cd app
-fastapi dev main.py
+# Start server
+fastapi dev app/main.py
 
-# Alternative: using uv from server directory
+# Alternative: using uv
 uv run fastapi dev app/main.py --port 8000
 
 # Or using uvicorn directly
 uvicorn app.main:app --reload --port 8000
-````
+```
 
 The API will be available at:
 
--   **API Documentation**: <http://localhost:8000/docs>
--   **Alternative Docs**: <http://localhost:8000/redoc>
--   **Health Check**: <http://localhost:8000/health>
+- **API Documentation**: <http://localhost:8000/docs>
+- **Alternative Docs**: <http://localhost:8000/redoc>
+- **Health Check**: <http://localhost:8000/health>
 
 ## 📦 Available Commands
 
 ```bash
 # Development server (from app/ directory)
-cd app && fastapi dev main.py
+fastapi dev app/main.py
 
 # Development server (from server/ directory)
 uv run fastapi dev app/main.py
@@ -171,12 +168,12 @@ uv run ruff format
 
 ## 🛠️ Tech Stack
 
--   **Framework**: FastAPI with async/await support
--   **Database**: MongoDB with AsyncIOMotorClient
--   **Authentication**: JWT tokens with bcrypt password hashing
--   **Validation**: Pydantic v2 with type validation
--   **Configuration**: Pydantic Settings with environment variables
--   **Documentation**: Auto-generated OpenAPI/Swagger docs
+- **Framework**: FastAPI with async/await support
+- **Database**: MongoDB with AsyncIOMotorClient
+- **Authentication**: JWT tokens with bcrypt password hashing
+- **Validation**: Pydantic v2 with type validation
+- **Configuration**: Pydantic Settings with environment variables
+- **Documentation**: Auto-generated OpenAPI/Swagger docs
 
 ## 🏗️ Project Structure
 
@@ -250,8 +247,8 @@ server/
 
 ## 📚 Additional Resources
 
--   [FastAPI Documentation](https://fastapi.tiangolo.com/)
--   [MongoDB Python Driver](https://pymongo.readthedocs.io/)
--   [Pydantic Documentation](https://docs.pydantic.dev/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [MongoDB Python Driver](https://pymongo.readthedocs.io/)
+- [Pydantic Documentation](https://docs.pydantic.dev/)
 
 For detailed project information, see the main [README](../README.md).
