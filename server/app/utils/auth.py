@@ -38,3 +38,22 @@ def superuser_required(func):
         return await func(req, *args, **kwargs)
 
     return wrapper
+
+
+def active_user_required(func):
+    """
+    Decorator to ensure a user is active before
+    executing the endpoint logic.
+    """
+
+    @wraps(func)
+    async def wrapper(req: Request, *args, **kwargs):
+        user = req.state.user
+        if not user or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Active user access is required to access this resource.",
+            )
+        return await func(req, *args, **kwargs)
+
+    return wrapper
