@@ -1,12 +1,11 @@
+"use client";
 import FormField from "./InputField";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/types";
-
-export default function FormFieldRenderer({
-    title,
-    description,
-    fields,
-}: Form) {
+import { useEffect, useState } from "react";
+import { FormFieldProps } from "@/types";
+export default function FormSubmit({ title, description, fields }: Form) {
+    const [formData, setFormData] = useState<FormFieldProps[]>(fields);
     return (
         <div className="max-w-2xl mx-auto p-6 min-h-screen mt-24 bg-background mb-12">
             <div className="mb-4 border-2 p-4 rounded-md">
@@ -18,7 +17,7 @@ export default function FormFieldRenderer({
                 </p>
             </div>
             <form className="space-y-4">
-                {fields.map((field, index) => (
+                {formData.map((field, index) => (
                     <FormField key={index} {...field} />
                 ))}
                 <div className="pt-6">

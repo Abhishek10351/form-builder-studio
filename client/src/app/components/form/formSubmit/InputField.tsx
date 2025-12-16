@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { FormFieldProps } from "@/types";
 
-export default function FormField({
+export default function FormSubmitField({
     label,
     placeholder,
     type = "text",

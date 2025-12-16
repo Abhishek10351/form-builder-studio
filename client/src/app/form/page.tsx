@@ -1,5 +1,5 @@
 "use client";
-import FormFieldRenderer from "../components/form/FormFieldRenderer";
+import { FormSubmit } from "../components/form";
 import { Form } from "@/types/form";
 
 const sampleForm: Form = {
@@ -56,5 +56,5 @@ const sampleForm: Form = {
 };
 
 export default function FormSubmitter() {
-    return <FormFieldRenderer {...sampleForm} />;
+    return <FormSubmit {...sampleForm} />;
 }

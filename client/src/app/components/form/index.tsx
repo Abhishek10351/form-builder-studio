@@ -1,1 +1,1 @@
-export { default as FormField } from "./InputField";
+export * from "./formSubmit";
