@@ -49,7 +49,7 @@ async def get_forms(req: Request):
 async def create_form(req: Request, form: Form):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"] 
-    form_dict = form.dict(by_alias=True,exclude={"id"})
+    form_dict = form.model_dump(by_alias=True,exclude={"id"})
     form_dict["owner_id"] = str(user.email)
     result = await forms.insert_one(form_dict)
     form_dict["_id"] = str(result.inserted_id)

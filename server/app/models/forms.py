@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, BeforeValidator
+from pydantic import BaseModel, EmailStr, Field, BeforeValidator, field_validator
 from typing import Optional, Annotated
 from bson import ObjectId
 from datetime import datetime, date
@@ -16,6 +16,34 @@ class FormField(BaseModel):
     )
     required: bool = Field(default=False)
     options: list[str] | None = None
+    multi_select: bool = Field(default=False)
+
+    @field_validator("options", mode="before")
+    @classmethod
+    def validate_options(cls, v, values):
+        if values.get("field_type") in ("checkbox", "radio", "dropdown"):
+            if not v or not isinstance(v, list) or len(v) == 0:
+                raise ValueError(
+                    f"Options must be provided for field type '{values.get('field_type')}'"
+                )
+        return v
+    
+    @field_validator("multi_select", mode="before")
+    @classmethod
+    def validate_multi_select(cls, v, values):
+        if values.get("field_type") != "checkbox" and len(values.get("options"))==0 and v:
+            raise ValueError(
+                f"Multi-select can only be true for 'checkox'"
+            )
+        return v
+
+    @field_validator("field_type", mode="before")
+    @classmethod
+    def validate_field_type(cls, v):
+        allowed_types = {"text", "checkbox", "radio", "dropdown", "date"}
+        if v not in allowed_types:
+            raise ValueError(f"field_type must be one of {allowed_types}")
+        return v
 
 
 class Form(BaseModel):
