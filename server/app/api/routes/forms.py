@@ -2,9 +2,9 @@ from fastapi import APIRouter, Request, Response, status
 from models import Form, User
 import json
 import datetime
+from bson import ObjectId
 
-# from utils import login_required, superuser_required
-from utils import generate_form_id
+from utils import login_required
 
 router = APIRouter(prefix="/forms", tags=["forms"])
 
@@ -14,11 +14,11 @@ router = APIRouter(prefix="/forms", tags=["forms"])
     response_model=Form,
     status_code=200,
 )
-# @login_required
+@login_required
 async def get_form(req: Request, form_id: str):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-    form = await forms.find_one({"_id": form_id})
+    form = await forms.find_one({"_id": ObjectId(form_id)})
     if not form:
         return Response(
             content=json.dumps({"message": "Form not found"}),
@@ -29,7 +29,7 @@ async def get_form(req: Request, form_id: str):
 
 
 @router.get("/", response_model=list[Form], status_code=200)
-# @login_required
+@login_required
 async def get_forms(req: Request):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
@@ -45,16 +45,12 @@ async def get_forms(req: Request):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-# @login_required
+@login_required
 async def create_form(req: Request, form: Form):
     user: User | None = req.state.user
-    forms = req.app.mongodb["forms"]
-    form_id = generate_form_id()
-
-    form.created_at = datetime.datetime.now().isoformat()
-    form.id = form_id
-    form_dict = form.model_dump(by_alias=True)
-    # form_dict["owner_id"] = str(user["_id"])
+    forms = req.app.mongodb["forms"] 
+    form_dict = form.dict(by_alias=True,exclude={"id"})
+    form_dict["owner_id"] = str(user.email)
     result = await forms.insert_one(form_dict)
     form_dict["_id"] = str(result.inserted_id)
     return Response(
