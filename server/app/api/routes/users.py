@@ -14,7 +14,9 @@ async def create_user(req: Request, user: User):
         collection = req.app.mongodb["users"]
         user.password = get_password_hash(user.password)
         user.is_superuser = False
-        result = await collection.insert_one(user.model_dump())
+        user.is_active = True
+        user_dict = user.model_dump(by_alias=True, exclude={"id"})
+        result = await collection.insert_one(user_dict)
         inserted_user = await collection.find_one({"_id": result.inserted_id})
         return User(**inserted_user)
     except DuplicateKeyError:
