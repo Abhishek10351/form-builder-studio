@@ -14,19 +14,19 @@ import { FormFieldProps } from "@/types";
 export default function FormSubmitField({
     label,
     placeholder,
-    type = "text",
+    field_type = "text",
     required,
     options,
     value,
     onChange,
 }: FormFieldProps) {
     const renderInput = () => {
-        switch (type) {
+        switch (field_type) {
             case "text":
             case "date":
                 return (
                     <Input
-                        type={type}
+                        type={field_type}
                         placeholder={placeholder}
                         required={required}
                         value={value as string}

@@ -3,9 +3,28 @@ import FormField from "./InputField";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/types";
 import { useEffect, useState } from "react";
-import { FormFieldProps } from "@/types";
+import { FormFieldProps, FormSubmitValue } from "@/types";
 export default function FormSubmit({ title, description, fields }: Form) {
     const [formData, setFormData] = useState<FormFieldProps[]>(fields);
+    useEffect(() => {
+        const initialFormData = fields.map((field) => ({
+            ...field,
+            value: field.field_type === "checkbox" ? false : "",
+        }));
+        setFormData(initialFormData);
+    }, [fields]);
+
+    const updateFieldValue = (id: string, value: FormSubmitValue) => {
+        const updatedFormData = [...formData];
+        const fieldIndex = updatedFormData.findIndex(
+            (field) => field.id === id
+        );
+        if (fieldIndex !== -1) {
+            updatedFormData[fieldIndex].value = value;
+        }
+        setFormData(updatedFormData);
+    };
+
     return (
         <div className="max-w-2xl mx-auto p-6 min-h-screen mt-24 bg-background mb-12">
             <div className="mb-4 border-2 p-4 rounded-md">
@@ -18,7 +37,13 @@ export default function FormSubmit({ title, description, fields }: Form) {
             </div>
             <form className="space-y-4">
                 {formData.map((field, index) => (
-                    <FormField key={index} {...field} />
+                    <FormField
+                        key={index}
+                        {...field}
+                        onChange={(value: FormSubmitValue) =>
+                            updateFieldValue(field.id!, value)
+                        }
+                    />
                 ))}
                 <div className="pt-6">
                     <Button type="submit" className="w-full cursor-pointer">
