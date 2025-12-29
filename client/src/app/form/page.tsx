@@ -1,5 +1,4 @@
-import FormView from "../components/form/formView/FormView";
-
+import { FormView } from "../components/form";
 
 export default function Page() {
     return <FormView />;
