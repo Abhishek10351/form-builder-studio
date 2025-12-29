@@ -4,3 +4,4 @@ pyjwt
 passlib
 pydantic-settings
 bcrypt
+nanoid
