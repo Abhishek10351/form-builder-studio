@@ -1,3 +1,3 @@
 export { default as FormField } from "./InputField";
-export { default as FormSubmit } from "./FormSubmit";
+export { default as FormSubmitPage } from "./FormSubmitPage";
 export { default as FormSubmitClient } from "./FormSubmitClient";

@@ -1,11 +1,16 @@
 "use client";
+
 import FormField from "./InputField";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/types";
+import { FormSubmit } from "@/types";
 import { useEffect, useState } from "react";
-import { FormFieldProps, FormSubmitValue } from "@/types";
-export default function FormSubmit({ title, description, fields }: Form) {
-    const [formData, setFormData] = useState<FormFieldProps[]>(fields);
+import { FormSubmitFieldProps, FormSubmitValue } from "@/types";
+export default function FormSubmitPage({
+    title,
+    description,
+    fields,
+}: FormSubmit) {
+    const [formData, setFormData] = useState<FormSubmitFieldProps[]>(fields);
     useEffect(() => {
         const initialFormData = fields.map((field) => ({
             ...field,

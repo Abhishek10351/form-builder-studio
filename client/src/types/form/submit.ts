@@ -1,9 +1,8 @@
-// Form Builder Types
 
 export type FieldType = "text" | "checkbox" | "radio" | "dropdown" | "date";
 export type FormSubmitValue = string | boolean | string[] | Date;
 
-export interface FormField {
+export interface FormSubmitField {
     id?: string;
     label: string;
     field_type: FieldType;
@@ -12,28 +11,25 @@ export interface FormField {
     multi_select?: boolean;
 }
 
-export interface Form {
+export interface FormSubmit {
     id?: string;
     title: string;
     description?: string;
-    fields: FormField[];
+    fields: FormSubmitField[];
     createdAt?: string;
     updatedAt?: string;
 }
 
-export interface FormFieldProps {
+export interface FormSubmitFieldProps {
     id?: string;
     label: string;
-    placeholder?: string;
-    type?: FieldType;
+    field_type?: FieldType;
     required?: boolean;
     options?: string[];
     value?: FormSubmitValue;
     onChange?: (value: FormSubmitValue) => void;
-    description?: string;
 }
 
-// Utility types for better type safety
 export type FormFieldValue = string | boolean | string[] | Date | null;
 
 export interface SubmissionField {
