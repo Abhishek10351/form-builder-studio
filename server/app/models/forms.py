@@ -9,7 +9,7 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class FormField(BaseModel):
-    id: str = Field(default_factory=generate_random_id)
+    id: str = Field(default_factory=generate_random_id, frozen=True)
     label: str = "Untitled Question"
     field_type: str = Field(
         default="text", pattern=r"^(text|checkbox|radio|dropdown|date)$"
@@ -18,36 +18,36 @@ class FormField(BaseModel):
     options: list[str] | None = None
     multi_select: bool = Field(default=False)
 
-    @field_validator("options", mode="before")
-    @classmethod
-    def validate_options(cls, v, values):
-        if values.get("field_type") in ("checkbox", "radio", "dropdown"):
-            if not v or not isinstance(v, list) or len(v) == 0:
-                raise ValueError(
-                    f"Options must be provided for field type '{values.get('field_type')}'"
-                )
-        return v
+    # @field_validator("options", mode="before")
+    # @classmethod
+    # def validate_options(cls, v, values):
+    #     if values.get("field_type") in ("checkbox", "radio", "dropdown"):
+    #         if not v or not isinstance(v, list) or len(v) == 0:
+    #             raise ValueError(
+    #                 f"Options must be provided for field type '{values.get('field_type')}'"
+    #             )
+    #     return v
     
-    @field_validator("multi_select", mode="before")
-    @classmethod
-    def validate_multi_select(cls, v, values):
-        if values.get("field_type") != "checkbox" and len(values.get("options"))==0 and v:
-            raise ValueError(
-                f"Multi-select can only be true for 'checkox'"
-            )
-        return v
+    # @field_validator("multi_select", mode="before")
+    # @classmethod
+    # def validate_multi_select(cls, v, values):
+    #     if values.get("field_type") != "checkbox" and len(values.get("options"))==0 and v:
+    #         raise ValueError(
+    #             f"Multi-select can only be true for 'checkox'"
+    #         )
+    #     return v
 
-    @field_validator("field_type", mode="before")
-    @classmethod
-    def validate_field_type(cls, v):
-        allowed_types = {"text", "checkbox", "radio", "dropdown", "date"}
-        if v not in allowed_types:
-            raise ValueError(f"field_type must be one of {allowed_types}")
-        return v
+    # @field_validator("field_type", mode="before")
+    # @classmethod
+    # def validate_field_type(cls, v):
+    #     allowed_types = {"text", "checkbox", "radio", "dropdown", "date"}
+    #     if v not in allowed_types:
+    #         raise ValueError(f"field_type must be one of {allowed_types}")
+    #     return v
 
 
 class Form(BaseModel):
-    id: Optional[PyObjectId] = Field(default=None, alias="_id")
+    id: str = Field(default_factory=generate_random_id, alias="_id", frozen=True)
     title: str = "Untitled Form"
     description: str | None = ""
     fields: list[FormField] = Field(default_factory=list)

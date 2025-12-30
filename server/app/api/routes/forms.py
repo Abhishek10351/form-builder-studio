@@ -2,8 +2,8 @@ from fastapi import APIRouter, Request, Response, status
 from models import Form, User
 import json
 import datetime
-from bson import ObjectId
-
+from pydantic import BaseModel, Field
+from typing import Optional
 from utils import login_required
 
 router = APIRouter(prefix="/forms", tags=["forms"])
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/forms", tags=["forms"])
 async def get_form(req: Request, form_id: str):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-    form = await forms.find_one({"_id": ObjectId(form_id)})
+    form = await forms.find_one({"_id": form_id})
     if not form:
         return Response(
             content=json.dumps({"message": "Form not found"}),
@@ -28,7 +28,13 @@ async def get_form(req: Request, form_id: str):
     return Form.model_validate(form).model_dump(by_alias=True)
 
 
-@router.get("/", response_model=list[Form], status_code=200)
+class FormsListResponse(BaseModel):
+    id: str = Field(alias="_id")
+    title: str
+    description: str
+
+
+@router.get("/", response_model=list[FormsListResponse], status_code=200)
 @login_required
 async def get_forms(req: Request):
     user: User | None = req.state.user
@@ -40,7 +46,8 @@ async def get_forms(req: Request):
         cursor = forms.find({"owner_id": user.email})
     form_list = []
     async for form in cursor:
-        form_list.append(Form.model_validate(form).model_dump(by_alias=True))
+        form_list.append(
+            FormsListResponse.model_validate(form).model_dump(by_alias=True))
     return form_list
 
 
@@ -49,10 +56,9 @@ async def get_forms(req: Request):
 async def create_form(req: Request, form: Form):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"] 
-    form_dict = form.model_dump(by_alias=True,exclude={"id"})
+    form_dict = form.model_dump(by_alias=True)
     form_dict["owner_id"] = str(user.email)
     result = await forms.insert_one(form_dict)
-    form_dict["_id"] = str(result.inserted_id)
     return Response(
         content=json.dumps(form_dict),
         status_code=201,
@@ -65,7 +71,7 @@ async def create_form(req: Request, form: Form):
 async def delete_form(req: Request, form_id: str):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-    form = await forms.find_one({"_id": ObjectId(form_id)})
+    form = await forms.find_one({"_id": form_id})
     if not form:
         return Response(
             content=json.dumps({"message": "Form not found"}),
@@ -78,5 +84,5 @@ async def delete_form(req: Request, form_id: str):
             status_code=403,
             media_type="application/json",
         )
-    await forms.delete_one({"_id": ObjectId(form_id)})
+    await forms.delete_one({"_id": form_id})
     return Response(status_code=status.HTTP_204_NO_CONTENT)
