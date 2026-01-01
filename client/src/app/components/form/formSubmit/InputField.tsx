@@ -9,17 +9,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { FormFieldProps } from "@/types";
+import { FormSubmitFieldProps } from "@/types";
 
 export default function FormSubmitField({
     label,
-    placeholder,
     field_type = "text",
     required,
     options,
     value,
     onChange,
-}: FormFieldProps) {
+}: FormSubmitFieldProps) {
     const renderInput = () => {
         switch (field_type) {
             case "text":
@@ -27,11 +26,9 @@ export default function FormSubmitField({
                 return (
                     <Input
                         type={field_type}
-                        placeholder={placeholder}
                         required={required}
                         value={value as string}
                         onChange={(e) => onChange?.(e.target.value)}
-                        className="border-0 border-b-2 border-gray-300 rounded-none p-2 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                     />
                 );
 
@@ -49,7 +46,6 @@ export default function FormSubmitField({
                             htmlFor={`checkbox-${label}`}
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
-                            {placeholder || "Check this box"}
                         </Label>
                     </div>
                 );
@@ -88,7 +84,7 @@ export default function FormSubmitField({
                     >
                         <SelectTrigger>
                             <SelectValue
-                                placeholder={placeholder || "Select an option"}
+                                placeholder={`Select an option`}
                             />
                         </SelectTrigger>
                         <SelectContent>
