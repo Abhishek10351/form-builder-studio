@@ -1,5 +1,7 @@
 "use client";
+
 import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
 import {
     Select,
     SelectContent,
@@ -8,57 +10,148 @@ import {
     SelectGroup,
     SelectItem,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Trash } from "lucide-react";
-import { TrashIcon } from "lucide-react";
+import {
+    TrashIcon,
+    EllipsisVerticalIcon,
+    CopyIcon,
+    XIcon,
+    CircleIcon,
+    SquareIcon,
+} from "lucide-react";
+import TextareaAutoSize from "react-textarea-autosize";
+import { Input } from "@/components/ui/input";
 const fields = [
+    // text, checkbox, radio, date, dropdown
     { label: "Text", value: "text" },
-    { label: "Number", value: "number" },
-    { label: "Email", value: "email" },
+    { label: "Checkbox", value: "checkbox" },
+    { label: "Radio", value: "radio" },
+    { label: "Dropdown", value: "dropdown" },
     { label: "Date", value: "date" },
 ];
-export default function FormCreateInput() {
+export const RenderDropdownOptions = ({ names }: { names: string[] }) => {
     return (
-        <div className="mb-4 mx-auto p-4 h-48 overflow-y-auto">
-            <Input
-                placeholder="Question"
-                className="border-0 border-b-2 border-gray-300 rounded-none p-2 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
-                
-            />
-            <div className="my-4 g-white rounded-lg">
-                <Select defaultValue={fields[0].value}>
-                    <SelectTrigger className="border-1 w-[8rem] border-gray-300 rounded-sm p-2 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0">
-                        <SelectValue placeholder="Select field type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            {fields.map((field) => (
-                                <SelectItem
-                                    key={field.value}
-                                    value={field.value}
-                                >
-                                    {field.label}
-                                </SelectItem>
-                            ))}
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
+        <ol className="list-decimal pl-5 flex flex-col gap-2">
+            {names.map((name, index) => (
+                <li key={index}>
+                    <div className="flex justify-between items-center gap-2">
+                        <Input className="border-0" defaultValue={name} />
+                        <XIcon className="w-4 h-4 cursor-pointer hover:text-red-500 basis-4" />
+                    </div>
+                </li>
+            ))}
+        </ol>
+    );
+};
+export const RenderRadioOptions = ({ names }: { names: string[] }) => {
+    return (
+        <ol className="list-none flex flex-col gap-2">
+            {names.map((name, index) => (
+                <li
+                    key={index}
+                    className="flex flex-row justify-between items-center gap-2 "
+                >
+                    <div className="flex items-center basis-auto grow">
+                        <CircleIcon className="w-4 h-4 mr-2 inline-block text-gray-300 dark:text-gray-600" />
+
+                        <Input className="border-0" defaultValue={name} />
+                    </div>
+                    <XIcon className="w-4 h-4 cursor-pointer hover:text-red-500 basis-4 " />
+                </li>
+            ))}
+        </ol>
+    );
+};
+
+const optionsNames = ["Option 1", "Option 2", "Option 3"];
+const renderFieldInput = (fieldType: string) => {
+    switch (fieldType) {
+        case "text":
+            return (
+                <Input
+                    className="disabled:border"
+                    disabled
+                    placeholder="Answer"
+                />
+            );
+        case "checkbox":
+            return (
+                <>
+                    <div className="flex items-center gap-2">
+                        <SquareIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                        <div className="text-muted-foreground">Option</div>
+                    </div>
+                </>
+            );
+        case "radio":
+            return <RenderRadioOptions names={optionsNames} />;
+        case "dropdown":
+            return <RenderDropdownOptions names={optionsNames} />;
+        case "date":
+            return (
+                <Input
+                    type="date"
+                    className="disabled:border"
+                    disabled
+                />
+            );
+        default:
+            return null;
+    }
+};
+export default function FormCreateInput() {
+    const [selectedField, setSelectedField] = useState(fields[0].value);
+
+    useEffect(() => {}, [selectedField]);
+
+    return (
+        <div className="mb-4 mx-auto px-2 py-2 overflow-y-auto flex flex-col gap-4">
+            <div className="flex flex-row gap-4">
+                <TextareaAutoSize
+                    placeholder="Question"
+                    className="border resize-none rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                />
+                <div>
+                    <Select
+                        value={selectedField}
+                        onValueChange={setSelectedField}
+                    >
+                        <SelectTrigger className="w-[8rem] rounded-md p-2">
+                            <SelectValue placeholder="Select field type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                {fields.map((field) => (
+                                    <SelectItem
+                                        key={field.value}
+                                        value={field.value}
+                                    >
+                                        {field.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
-            <Separator className="my-4" />
-            <div className="flex items-center justiy-between flex-row">
-                <div className="">
-                    <TrashIcon className="cursor-pointer" />
+            {renderFieldInput(selectedField)}
+            <Separator />
+            <div className="flex items-center flex-row">
+                <div className="flex flex-row items-center grow gap-4">
+                    <CopyIcon className="cursor-pointer hover:text-blue-500 w-5 aspect-square" />
+                    <TrashIcon className="cursor-pointer hover:text-red-500 w-5 aspect-square" />
                 </div>
-                <div className="bg-red-200 w-0.5 h-full mx-4">
-
-                </div>
-                <Separator className="bg-red-200 w-2 h-full" orientation="vertical" decorative />
-                <div className="gap-2 mb-4 flex items-center">
-                    <Switch id="required-switch" />
-                    <Label htmlFor="required-switch">Required</Label>
+                <div className="flex flex-row mx-4 basis-8 gap-4">
+                    <Separator className="mx4" orientation="vertical" />
+                    <div className="gap-2 flex items-center">
+                        <Switch id="required-switch" />
+                        <Label htmlFor="required-switch">Required</Label>
+                    </div>
+                    <div className="">
+                        <EllipsisVerticalIcon className="cursor-pointer" />
+                    </div>
                 </div>
             </div>
         </div>

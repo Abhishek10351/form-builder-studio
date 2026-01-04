@@ -1,5 +1,4 @@
 import FormCreateInput from "./formCreateInput";
-
 export default function FormCreate() {
 
     return (
