@@ -1,11 +1,9 @@
-
-export type FieldType = "text" | "checkbox" | "radio" | "dropdown" | "date";
 export type FormSubmitValue = string | boolean | string[] | Date;
 
 export interface FormSubmitField {
     id?: string;
     label: string;
-    field_type: FieldType;
+    field_type: "text" | "checkbox" | "radio" | "dropdown" | "date";
     required: boolean;
     options?: string[];
     multi_select?: boolean;
@@ -23,7 +21,7 @@ export interface FormSubmit {
 export interface FormSubmitFieldProps {
     id?: string;
     label: string;
-    field_type?: FieldType;
+    field_type?: "text" | "checkbox" | "radio" | "dropdown" | "date";
     required?: boolean;
     options?: string[];
     value?: FormSubmitValue;
