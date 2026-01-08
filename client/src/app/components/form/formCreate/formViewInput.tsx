@@ -12,14 +12,10 @@ import {
 } from "@/components/ui/select";
 import { SquareIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-const fields = [
-    { label: "Text", value: "text" },
-    { label: "Checkbox", value: "checkbox" },
-    { label: "Radio", value: "radio" },
-    { label: "Dropdown", value: "dropdown" },
-    { label: "Date", value: "date" },
-];
+import { FieldType, FormCreateField, FormViewInputProps } from "@/types";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { FIELD_TYPE_OPTIONS, DEFAULT_OPTION_NAMES } from "./constants";
+import { PencilIcon } from "lucide-react";
 export const RenderDropdownOptions = ({ names }: { names: string[] }) => {
     return (
         <Select>
@@ -54,8 +50,7 @@ export const RenderRadioOptions = ({ names }: { names: string[] }) => {
     );
 };
 
-const optionsNames = ["Option 1", "Option 2", "Option 3"];
-const renderFieldInput = (fieldType: string) => {
+const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
     switch (fieldType) {
         case "text":
             return (
@@ -75,51 +70,44 @@ const renderFieldInput = (fieldType: string) => {
                 </>
             );
         case "radio":
-            return <RenderRadioOptions names={optionsNames} />;
+            return (
+                <RenderRadioOptions names={options || DEFAULT_OPTION_NAMES} />
+            );
         case "dropdown":
-            return <RenderDropdownOptions names={optionsNames} />;
+            return (
+                <RenderDropdownOptions
+                    names={options || DEFAULT_OPTION_NAMES}
+                />
+            );
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
             return null;
     }
 };
-export default function FormViewInput() {
-    const [selectedField, setSelectedField] = useState(fields[0].value);
-
-    useEffect(() => {}, [selectedField]);
+export default function FormViewInput({
+    field,
+    onFieldUpdate,
+}: FormViewInputProps) {
+    if (!field) return null;
 
     return (
-        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 overflow-y-auto flex flex-col gap-4">
+        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 overflow-y-auto flex flex-col gap-4 relative">
+            <button
+                onClick={() => onFieldUpdate?.(field.id)}
+                className="absolute top-4 right-4 p-2 hover:bg-muted rounded-full transition-colors"
+                title="Edit field"
+            >
+                <PencilIcon className="w-4 h-4" />
+            </button>
             <div className="flex flex-row gap-4">
                 <div className="flex gap-2">
-                    Question <div className="text-red-500">*</div>
-                </div>
-                <div>
-                    <Select
-                        value={selectedField}
-                        onValueChange={setSelectedField}
-                    >
-                        <SelectTrigger className="w-[8rem] rounded-md p-2">
-                            <SelectValue placeholder="Select field type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                {fields.map((field) => (
-                                    <SelectItem
-                                        key={field.value}
-                                        value={field.value}
-                                    >
-                                        {field.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                    {field.label}{" "}
+                    {field.required && <div className="text-red-500">*</div>}
                 </div>
             </div>
 
-            {renderFieldInput(selectedField)}
+            {renderFieldInput(field.field_type, field?.options)}
         </div>
     );
 }
