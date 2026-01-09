@@ -2,14 +2,6 @@
 
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
-import {
-    Select,
-    SelectContent,
-    SelectTrigger,
-    SelectValue,
-    SelectGroup,
-    SelectItem,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -23,7 +15,7 @@ import {
 import TextareaAutoSize from "react-textarea-autosize";
 import { Input } from "@/components/ui/input";
 import { FieldType, FormCreateInputProps, FormCreateField } from "@/types";
-import { FIELD_TYPE_OPTIONS } from "./constants";
+import InputTypeSelect from "./inputTypeSelect";
 export const RenderDropdownOptions = ({
     field,
     onFieldChange,
@@ -193,28 +185,12 @@ export default function FormCreateInput({
                     className="border resize-none rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
                 />
                 <div>
-                    <Select
+                    <InputTypeSelect
                         value={selectedField}
-                        onValueChange={(value) =>
+                        onChange={(value) =>
                             setSelectedField(value as FieldType)
                         }
-                    >
-                        <SelectTrigger className="w-[8rem] rounded-md p-4 h-auto">
-                            <SelectValue placeholder="Select field type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                {FIELD_TYPE_OPTIONS.map((field) => (
-                                    <SelectItem
-                                        key={field.value}
-                                        value={field.value}
-                                    >
-                                        {field.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                    />
                 </div>
             </div>
 

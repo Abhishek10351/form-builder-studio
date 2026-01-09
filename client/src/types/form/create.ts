@@ -21,7 +21,7 @@ export interface FormCreateState {
 }
 
 export interface FormCreateInputProps {
-    field?: FormCreateField;
+    field: FormCreateField;
     onFieldChange?: (field: FormCreateField) => void;
     onFieldDelete?: (fieldId: string) => void;
     onFieldDuplicate?: (field: FormCreateField) => void;
@@ -31,13 +31,6 @@ export interface FormCreateInputProps {
 export interface FormViewInputProps {
     field?: FormCreateField;
     onFieldUpdate?: (fieldId: string) => void;
-}
-
-export interface RenderOptionsProps {
-    names: string[];
-    onOptionChange?: (index: number, value: string) => void;
-    onOptionDelete?: (index: number) => void;
-    onOptionAdd?: () => void;
 }
 
 export interface FieldTypeOption {
