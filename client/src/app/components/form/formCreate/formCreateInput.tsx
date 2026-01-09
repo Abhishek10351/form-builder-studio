@@ -16,10 +16,10 @@ import TextareaAutoSize from "react-textarea-autosize";
 import { Input } from "@/components/ui/input";
 import { FieldType, FormCreateInputProps, FormCreateField } from "@/types";
 import InputTypeSelect from "./inputTypeSelect";
-export const RenderDropdownOptions = ({
+
+export const RenderOptionsInput = ({
     field,
     onFieldChange,
-    onFieldDelete,
 }: FormCreateInputProps) => {
     const [optionNames, setOptionNames] = useState<string[]>(
         field.options || []
@@ -90,27 +90,6 @@ export const RenderDropdownOptions = ({
     );
 };
 
-export const RenderRadioOptions = ({ field }: FormCreateInputProps) => {
-    const names = field.options || [];
-    return (
-        <ol className="list-none flex flex-col gap-2">
-            {names.map((name, index) => (
-                <li
-                    key={index}
-                    className="flex flex-row justify-between items-center gap-2 "
-                >
-                    <div className="flex items-center basis-auto grow">
-                        <CircleIcon className="w-4 h-4 mr-2 inline-block text-gray-300 dark:text-gray-600" />
-
-                        <Input className="border-0" defaultValue={name} />
-                    </div>
-                    <XIcon className="w-4 h-4 cursor-pointer hover:text-red-500 basis-4 " />
-                </li>
-            ))}
-        </ol>
-    );
-};
-
 export const RenderFieldInput = ({
     field,
     onFieldChange,
@@ -137,9 +116,8 @@ export const RenderFieldInput = ({
                 </>
             );
         case "radio":
-            return <RenderRadioOptions {...{ field }} />;
         case "dropdown":
-            return <RenderDropdownOptions {...{ field, onFieldChange }} />;
+            return <RenderOptionsInput {...{ field, onFieldChange }} />;
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
@@ -168,9 +146,7 @@ export default function FormCreateInput({
                 label,
                 field_type: selectedField,
                 required,
-                options: ["radio", "dropdown"].includes(selectedField)
-                    ? options
-                    : undefined,
+                options,
             });
         }
     }, [selectedField, label, required]);
