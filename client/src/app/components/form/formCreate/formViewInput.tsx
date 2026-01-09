@@ -1,52 +1,33 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
-import {
-    Select,
-    SelectContent,
-    SelectTrigger,
-    SelectValue,
-    SelectGroup,
-    SelectItem,
-} from "@/components/ui/select";
-import { SquareIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { FieldType, FormCreateField, FormViewInputProps } from "@/types";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { FIELD_TYPE_OPTIONS } from "./constants";
-import { PencilIcon } from "lucide-react";
+import { FieldType, FormViewInputProps } from "@/types";
+import { SquareIcon, PencilIcon, CircleIcon } from "lucide-react";
 export const RenderDropdownOptions = ({ names }: { names: string[] }) => {
     return (
-        <Select>
-            <SelectTrigger className="w-full rounded-md p-2">
-                <SelectValue placeholder="Select an option" />
-            </SelectTrigger>
-            <SelectContent>
-                {names.map((name, index) => (
-                    <SelectItem key={index} value={name}>
-                        {name}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
+        <ol className="flex flex-col gap-2 list-decimal pl-5">
+            {names.map((name, index) => (
+                <li key={index}>
+                    <div className="flex items-center gap-2">
+                        <div className="text-muted-foreground">{name}</div>
+                    </div>
+                </li>
+            ))}
+        </ol>
     );
 };
 export const RenderRadioOptions = ({ names }: { names: string[] }) => {
     return (
-        <RadioGroup className="flex flex-col gap-2">
+        <ol className="flex flex-col gap-2">
             {names.map((name, index) => (
-                <div
-                    key={index}
-                    className="flex flex-row justify-between items-center gap-2 "
-                >
-                    <div className="flex items-center basis-auto grow">
-                        <RadioGroupItem value={name} className="mr-2" />
-                        <Label>{name}</Label>
+                <li key={index}>
+                    <div className="flex items-center gap-2">
+                        <CircleIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                        <div className="text-muted-foreground">{name}</div>
                     </div>
-                </div>
+                </li>
             ))}
-        </RadioGroup>
+        </ol>
     );
 };
 
