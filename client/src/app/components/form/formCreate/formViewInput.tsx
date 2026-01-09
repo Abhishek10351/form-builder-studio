@@ -14,7 +14,7 @@ import { SquareIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { FieldType, FormCreateField, FormViewInputProps } from "@/types";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { FIELD_TYPE_OPTIONS, DEFAULT_OPTION_NAMES } from "./constants";
+import { FIELD_TYPE_OPTIONS } from "./constants";
 import { PencilIcon } from "lucide-react";
 export const RenderDropdownOptions = ({ names }: { names: string[] }) => {
     return (
@@ -70,15 +70,9 @@ const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
                 </>
             );
         case "radio":
-            return (
-                <RenderRadioOptions names={options || DEFAULT_OPTION_NAMES} />
-            );
+            return <RenderRadioOptions names={options || []} />;
         case "dropdown":
-            return (
-                <RenderDropdownOptions
-                    names={options || DEFAULT_OPTION_NAMES}
-                />
-            );
+            return <RenderDropdownOptions names={options || []} />;
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
