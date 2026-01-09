@@ -22,37 +22,84 @@ import {
 } from "lucide-react";
 import TextareaAutoSize from "react-textarea-autosize";
 import { Input } from "@/components/ui/input";
-import {
-    FieldType,
-    FieldTypeOption,
-    RenderOptionsProps,
-    FormCreateInputProps,
-} from "@/types";
-import { FIELD_TYPE_OPTIONS, DEFAULT_OPTION_NAMES } from "./constants";
+import { FieldType, FormCreateInputProps, FormCreateField } from "@/types";
+import { FIELD_TYPE_OPTIONS } from "./constants";
 export const RenderDropdownOptions = ({
-    names,
-    onOptionChange,
-    onOptionDelete,
-}: RenderOptionsProps) => {
+    field,
+    onFieldChange,
+    onFieldDelete,
+}: FormCreateInputProps) => {
+    const [optionNames, setOptionNames] = useState<string[]>(
+        field.options || []
+    );
+
+    const deleteOption = (index: number) => {
+        const updatedOptions = optionNames.filter((_, i) => i !== index);
+        setOptionNames(updatedOptions);
+        onFieldChange &&
+            onFieldChange({
+                ...field!,
+                options: updatedOptions,
+            } as FormCreateField);
+    };
+
+    const updateOption = (index: number, value: string) => {
+        const updatedOptions = [...optionNames];
+        updatedOptions[index] = value;
+        setOptionNames(updatedOptions);
+        onFieldChange &&
+            onFieldChange({
+                ...field!,
+                options: updatedOptions,
+            } as FormCreateField);
+    };
+
+    const addOption = () => {
+        const updatedOptions = [
+            ...optionNames,
+            `Option ${optionNames.length + 1}`,
+        ];
+        setOptionNames(updatedOptions);
+        onFieldChange &&
+            onFieldChange({
+                ...field!,
+                options: updatedOptions,
+            } as FormCreateField);
+    };
+
     return (
         <ol className="list-decimal pl-5 flex flex-col gap-2">
-            {names.map((name, index) => (
-                <li key={index}>
+            {optionNames.map((name, index) => (
+                <li key={`${field.id}-option-${index}-${name}`}>
                     <div className="flex justify-between items-center gap-2">
-                        <Input className="border-0" defaultValue={name} />
-                        <XIcon className="w-4 h-4 cursor-pointer hover:text-red-500 basis-4" />
+                        <Input
+                            className="border-0"
+                            value={name}
+                            onChange={(e) =>
+                                updateOption(index, e.target.value)
+                            }
+                        />
+                        <XIcon
+                            className="w-4 h-4 cursor-pointer hover:text-red-500 basis-4"
+                            onClick={() => deleteOption(index)}
+                        />
                     </div>
                 </li>
             ))}
+            <li className="mt-2 cursor-grab">
+                <button
+                    className="text-primary underline cursor-pointer"
+                    onClick={addOption}
+                >
+                    Add Option
+                </button>
+            </li>
         </ol>
     );
 };
 
-export const RenderRadioOptions = ({
-    names,
-    onOptionChange,
-    onOptionDelete,
-}: RenderOptionsProps) => {
+export const RenderRadioOptions = ({ field }: FormCreateInputProps) => {
+    const names = field.options || [];
     return (
         <ol className="list-none flex flex-col gap-2">
             {names.map((name, index) => (
@@ -72,7 +119,13 @@ export const RenderRadioOptions = ({
     );
 };
 
-const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
+export const RenderFieldInput = ({
+    field,
+    onFieldChange,
+    onFieldDelete,
+    onFieldDuplicate,
+}: FormCreateInputProps) => {
+    const { field_type: fieldType, options } = field;
     switch (fieldType) {
         case "text":
             return (
@@ -92,21 +145,16 @@ const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
                 </>
             );
         case "radio":
-            return (
-                <RenderRadioOptions names={options || DEFAULT_OPTION_NAMES} />
-            );
+            return <RenderRadioOptions {...{ field }} />;
         case "dropdown":
-            return (
-                <RenderDropdownOptions
-                    names={options || DEFAULT_OPTION_NAMES}
-                />
-            );
+            return <RenderDropdownOptions {...{ field, onFieldChange }} />;
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
             return null;
     }
 };
+
 export default function FormCreateInput({
     field,
     onFieldChange,
@@ -115,13 +163,11 @@ export default function FormCreateInput({
     onFieldUpdate,
 }: FormCreateInputProps) {
     const [selectedField, setSelectedField] = useState<FieldType>(
-        field?.field_type || FIELD_TYPE_OPTIONS[0].value
+        field.field_type
     );
-    const [label, setLabel] = useState(field?.label || "");
-    const [required, setRequired] = useState(field?.required || false);
-    const [options, setOptions] = useState(
-        field?.options || DEFAULT_OPTION_NAMES
-    );
+    const [label, setLabel] = useState(field.label || "");
+    const [required, setRequired] = useState(field.required || false);
+    const options = field.options || [];
 
     useEffect(() => {
         if (onFieldChange && field) {
@@ -135,7 +181,7 @@ export default function FormCreateInput({
                     : undefined,
             });
         }
-    }, [selectedField, label, required, options]);
+    }, [selectedField, label, required]);
 
     return (
         <div className="border rounded-lg mb-4 mx-auto px-4 py-8 overflow-y-auto flex flex-col gap-4">
@@ -172,7 +218,12 @@ export default function FormCreateInput({
                 </div>
             </div>
 
-            {renderFieldInput(selectedField, options)}
+            <RenderFieldInput
+                field={field}
+                onFieldChange={onFieldChange}
+                onFieldDelete={onFieldDelete}
+                onFieldDuplicate={onFieldDuplicate}
+            />
             <Separator />
             <div className="flex items-center flex-row">
                 <div className="flex flex-row items-center grow gap-4">
