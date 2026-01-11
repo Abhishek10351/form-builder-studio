@@ -25,15 +25,12 @@ export default function FormCreate() {
             ...field,
             id: generateId(),
         };
-        setFields((prev) => [...prev, newField]);
-    };
-
-    const handleFieldUpdate = (fieldId: string) => {
-        setFields((prev) =>
-            prev.map((f) =>
-                f.id === fieldId ? { ...f, isEditing: !f.isEditing } : f
-            )
-        );
+        setFields((prev) => {
+            const index = prev.findIndex((f) => f.id === field.id);
+            const newFields = [...prev];
+            newFields.splice(index + 1, 0, newField);
+            return newFields;
+        });
     };
 
     return (
@@ -46,12 +43,11 @@ export default function FormCreate() {
                             onFieldChange={handleFieldChange}
                             onFieldDelete={handleFieldDelete}
                             onFieldDuplicate={handleFieldDuplicate}
-                            onFieldUpdate={handleFieldUpdate}
                         />
                     ) : (
                         <FormViewInput
                             field={field}
-                            onFieldUpdate={handleFieldUpdate}
+                            onFieldChange={handleFieldChange}
                         />
                     )}
                 </div>

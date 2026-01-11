@@ -62,14 +62,16 @@ const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
 };
 export default function FormViewInput({
     field,
-    onFieldUpdate,
+    onFieldChange,
 }: FormViewInputProps) {
     if (!field) return null;
 
     return (
         <div className="border rounded-lg mb-4 mx-auto px-4 py-8 overflow-y-auto flex flex-col gap-4 relative">
             <button
-                onClick={() => onFieldUpdate?.(field.id)}
+                onClick={() =>
+                    onFieldChange?.({ ...field, isEditing: !field.isEditing })
+                }
                 className="absolute top-4 right-4 p-2 hover:bg-muted rounded-full transition-colors"
                 title="Edit field"
             >

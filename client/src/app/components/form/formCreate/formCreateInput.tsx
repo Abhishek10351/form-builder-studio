@@ -130,7 +130,6 @@ export default function FormCreateInput({
     onFieldChange,
     onFieldDelete,
     onFieldDuplicate,
-    onFieldUpdate,
 }: FormCreateInputProps) {
     const [selectedField, setSelectedField] = useState<FieldType>(
         field.field_type
@@ -174,7 +173,6 @@ export default function FormCreateInput({
                 field={field}
                 onFieldChange={onFieldChange}
                 onFieldDelete={onFieldDelete}
-                onFieldDuplicate={onFieldDuplicate}
             />
             <Separator />
             <div className="flex items-center flex-row">
@@ -182,13 +180,13 @@ export default function FormCreateInput({
                     <span title="Duplicate field">
                         <CopyIcon
                             className="cursor-pointer hover:text-blue-500 w-5 aspect-square"
-                            onClick={() => field && onFieldDuplicate?.(field)}
+                            onClick={() => onFieldDuplicate?.(field)}
                         />
                     </span>
                     <span title="Delete field">
                         <TrashIcon
                             className="cursor-pointer hover:text-red-500 w-5 aspect-square"
-                            onClick={() => field && onFieldDelete?.(field.id)}
+                            onClick={() => onFieldDelete?.(field.id)}
                         />
                     </span>
                 </div>
@@ -204,7 +202,7 @@ export default function FormCreateInput({
                     </div>
                     <div className="flex gap-2">
                         <button
-                            onClick={() => field && onFieldUpdate?.(field.id)}
+                            onClick={() => onFieldChange?.({ ...field, isEditing: !field.isEditing } )}
                             className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-sm"
                         >
                             Save
