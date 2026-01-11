@@ -6,7 +6,8 @@ import FormViewInput from "./formViewInput";
 import { FormCreateField } from "@/types";
 import { nanoid } from "nanoid";
 import { STATIC_FORM_FIELDS } from "./constants";
-
+import { SquarePlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 const generateId = () => nanoid(8);
 
 export default function FormCreate() {
@@ -52,6 +53,22 @@ export default function FormCreate() {
                     )}
                 </div>
             ))}
+            <Button
+                className="mt-4 cursor-pointer"
+                onClick={() => {
+                    const newField: FormCreateField = {
+                        id: generateId(),
+                        label: "New Field",
+                        field_type: "text",
+                        required: false,
+                        isEditing: false,
+                    };
+                    setFields((prev) => [...prev, newField]);
+                }}
+            >
+                <SquarePlusIcon className="mr-2 h-4 w-4" />
+                Add Field
+            </Button>
         </div>
     );
 }

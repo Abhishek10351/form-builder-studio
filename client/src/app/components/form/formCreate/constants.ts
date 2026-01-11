@@ -14,7 +14,6 @@ export const STATIC_FORM_FIELDS: FormCreateField[] = [
         label: "Full Name",
         field_type: "text",
         required: true,
-        placeholder: "Enter your full name",
         isEditing: false,
     },
 
