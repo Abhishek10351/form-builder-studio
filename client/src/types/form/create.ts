@@ -6,7 +6,6 @@ export interface FormCreateField {
     field_type: FieldType;
     required: boolean;
     options?: string[];
-    placeholder?: string;
     description?: string;
     isEditing?: boolean;
 }
@@ -25,12 +24,11 @@ export interface FormCreateInputProps {
     onFieldChange?: (field: FormCreateField) => void;
     onFieldDelete?: (fieldId: string) => void;
     onFieldDuplicate?: (field: FormCreateField) => void;
-    onFieldUpdate?: (fieldId: string) => void;
 }
 
 export interface FormViewInputProps {
-    field?: FormCreateField;
-    onFieldUpdate?: (fieldId: string) => void;
+    field: FormCreateField;
+    onFieldChange?: (field: FormCreateField) => void;
 }
 
 export interface FieldTypeOption {
