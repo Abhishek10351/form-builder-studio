@@ -10,7 +10,8 @@ import { SquarePlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 const generateId = () => nanoid(8);
 
-export default function FormCreate() {
+export default function FormCreate({formId}: {formId: string}) {
+    const ws = new WebSocket(`ws://127.0.0.1:8000/forms/ws/${formId}`);
     const [fields, setFields] = useState<FormCreateField[]>(STATIC_FORM_FIELDS);
 
     const handleFieldChange = (field: FormCreateField) => {
@@ -33,9 +34,20 @@ export default function FormCreate() {
             return newFields;
         });
     };
+    const addNewField = (field: FormCreateField) => {
+        setFields((prev) => [...prev, field]);
+    };
+    ws.onmessage = (event) => {
+        console.log("WebSocket message received:", event.data);
+        const data = JSON.parse(event.data);
+        if (data.action === "add_field") {
+            addNewField(data.field);
+        }
+
+    };
 
     return (
-        <div className="shadow w-full max-w-2xl mx-auto p-6 py-20">
+        <div className="shadow-lg w-full max-w-2xl mx-auto p-6 mt-20">
             {fields.map((field) => (
                 <div key={field.id}>
                     {field.isEditing ? (
@@ -63,7 +75,8 @@ export default function FormCreate() {
                         required: false,
                         isEditing: false,
                     };
-                    setFields((prev) => [...prev, newField]);
+                    // setFields((prev) => [...prev, newField]);
+                    ws.send(JSON.stringify({ action: "add_field", field: newField }));
                 }}
             >
                 <SquarePlusIcon className="mr-2 h-4 w-4" />
