@@ -1,12 +1,42 @@
 from fastapi import APIRouter, Request, Response, status
+from fastapi import (
+    Depends,
+    WebSocket,
+    WebSocketException,
+    Query,
+)
+from typing import Annotated
 from models import Form, User
 import json
 import datetime
 from pydantic import BaseModel, Field
 from typing import Optional
 from utils import login_required
+import nanoid
+from utils.manager import ConnectionManager
+
+manager = ConnectionManager()
 
 router = APIRouter(prefix="/forms", tags=["forms"])
+
+
+@router.websocket("/ws/{form_id}")
+async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_json()
+
+            # Echo the received data back to the client
+            form = {
+                "id": nanoid.generate(),
+                "field_type": "radio",
+                "label": "Sample Field ..",
+                "required": False,
+            }
+            await manager.send_personal_message({"action": "add_field", "data": form}, websocket)
+    except WebSocketDisconnect:
+        print(f"WebSocket disconnected for form_id: {form_id}")
 
 
 @router.get(
@@ -47,20 +77,22 @@ async def get_forms(req: Request):
     form_list = []
     async for form in cursor:
         form_list.append(
-            FormsListResponse.model_validate(form).model_dump(by_alias=True))
+            FormsListResponse.model_validate(form).model_dump(by_alias=True)
+        )
     return form_list
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-@login_required
+# @login_required
 async def create_form(req: Request, form: Form):
     user: User | None = req.state.user
-    forms = req.app.mongodb["forms"] 
+    forms = req.app.mongodb["forms"]
     form_dict = form.model_dump(by_alias=True)
     form_dict["owner_id"] = str(user.email)
+    print("Creating form:", form_dict)
     result = await forms.insert_one(form_dict)
     return Response(
-        content=json.dumps(form_dict),
+        content=Form.model_validate(form_dict).model_dump_json(),
         status_code=201,
         media_type="application/json",
     )
