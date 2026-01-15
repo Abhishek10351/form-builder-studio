@@ -20,6 +20,7 @@ app = FastAPI(
 )
 
 app.add_middleware(middleware.AuthMiddleware)
+app.add_middleware(middleware.WebSocketAuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.all_cors_origins,
