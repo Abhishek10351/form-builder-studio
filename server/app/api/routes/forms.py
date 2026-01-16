@@ -3,10 +3,11 @@ from fastapi import (
     Depends,
     WebSocket,
     WebSocketException,
+    WebSocketDisconnect,
     Query,
 )
 from typing import Annotated
-from models import Form, User
+from models import Form, FormField, User
 import json
 import datetime
 from pydantic import BaseModel, Field
@@ -14,6 +15,7 @@ from typing import Optional
 from utils import login_required
 import nanoid
 from utils.manager import ConnectionManager
+from utils import websocket_login_required, has_update_permission
 
 manager = ConnectionManager()
 
@@ -21,21 +23,56 @@ router = APIRouter(prefix="/forms", tags=["forms"])
 
 
 @router.websocket("/ws/{form_id}")
+@websocket_login_required
+@has_update_permission
 async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
     await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_json()
+            action = data.get("action")
+            mongo = websocket.app.mongodb
+            try:
+                match action:
+                    case "ping":
+                        await manager.send_personal_message(
+                            {"action": "pong"}, websocket
+                        )
+                    case "add_field":
+                        field = FormField()
+                        data = await mongo["forms"].update_one(
+                            {"_id": form_id},
+                            {"$push": {"fields": field.model_dump(by_alias=True)}},
+                        )
+                        await manager.broadcast(
+                            {
+                                "action": "add_field",
+                                "field": field.model_dump(),
+                            }
+                        )
+                    case "remove_field":
+                        field_id = data.get("field_id")
+                        if not field_id:
+                            raise ValueError("field_id is required for remove_field")
+                        t = await mongo["forms"].find_one({"_id": form_id})
+                        data = await mongo["forms"].update_one(
+                            {"_id": form_id},
+                            {"$pull": {"fields": {"id": field_id}}},
+                        )
+                        await manager.broadcast(
+                            {
+                                "action": "remove_field",
+                                "field_id": field_id,
+                            }
+                        )
 
-            # Echo the received data back to the client
-            form = {
-                "id": nanoid.generate(),
-                "field_type": "radio",
-                "label": "Sample Field ..",
-                "required": False,
-            }
-            await manager.send_personal_message({"action": "add_field", "data": form}, websocket)
+            except Exception as e:
+                print("Error processing action:", e)
+                await manager.send_personal_message(
+                    {"action": action, "message": str(e), "error": True}, websocket
+                )
     except WebSocketDisconnect:
+        manager.disconnect(websocket)
         print(f"WebSocket disconnected for form_id: {form_id}")
 
 

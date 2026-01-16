@@ -1,25 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormCreateInput from "./formCreateInput";
 import FormViewInput from "./formViewInput";
 import { FormCreateField } from "@/types";
 import { nanoid } from "nanoid";
-import { STATIC_FORM_FIELDS } from "./constants";
 import { SquarePlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { api } from "@/app/utils";
 const generateId = () => nanoid(8);
 
-export default function FormCreate({formId}: {formId: string}) {
-    const ws = new WebSocket(`ws://127.0.0.1:8000/forms/ws/${formId}`);
-    const [fields, setFields] = useState<FormCreateField[]>(STATIC_FORM_FIELDS);
+export default function FormCreate({ formId }: { formId: string }) {
+    const [fields, setFields] = useState<FormCreateField[]>([]);
+    const [ws, setWs] = useState<WebSocket | null>(null);
+
+    useEffect(() => {
+        const websocket = new WebSocket(
+            `ws://127.0.0.1:8000/forms/ws/${formId}`
+        );
+
+        websocket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (!data.error) {
+                switch (data.action) {
+                    case "add_field":
+                        setFields((prev) => [...prev, data.field]);
+                        break;
+                    case "remove_field":
+                        setFields((prev) =>
+                            prev.filter((f) => f.id !== data.field_id)
+                        );
+                        break;
+                }
+            } else {
+                console.error("WebSocket error:", data.message);
+            }
+        };
+
+        setWs(websocket);
+
+        const fetchFormData = async () => {
+            try {
+                const response = await api.get(`/forms/${formId}`);
+                if (response.data.fields) {
+                    setFields(response.data.fields);
+                }
+            } catch (error) {
+                console.error("Error fetching form data:", error);
+            }
+        };
+
+        fetchFormData();
+
+        return () => {
+            websocket.close();
+        };
+    }, [formId]);
 
     const handleFieldChange = (field: FormCreateField) => {
         setFields((prev) => prev.map((f) => (f.id === field.id ? field : f)));
     };
 
     const handleFieldDelete = (fieldId: string) => {
-        setFields((prev) => prev.filter((f) => f.id !== fieldId));
+        ws?.send(JSON.stringify({ action: "remove_field", field_id: fieldId }));
     };
 
     const handleFieldDuplicate = (field: FormCreateField) => {
@@ -34,16 +77,9 @@ export default function FormCreate({formId}: {formId: string}) {
             return newFields;
         });
     };
-    const addNewField = (field: FormCreateField) => {
-        setFields((prev) => [...prev, field]);
-    };
-    ws.onmessage = (event) => {
-        console.log("WebSocket message received:", event.data);
-        const data = JSON.parse(event.data);
-        if (data.action === "add_field") {
-            addNewField(data.field);
-        }
 
+    const addNewField = () => {
+        ws?.send(JSON.stringify({ action: "add_field" }));
     };
 
     return (
@@ -65,20 +101,7 @@ export default function FormCreate({formId}: {formId: string}) {
                     )}
                 </div>
             ))}
-            <Button
-                className="mt-4 cursor-pointer"
-                onClick={() => {
-                    const newField: FormCreateField = {
-                        id: generateId(),
-                        label: "New Field",
-                        field_type: "text",
-                        required: false,
-                        isEditing: false,
-                    };
-                    // setFields((prev) => [...prev, newField]);
-                    ws.send(JSON.stringify({ action: "add_field", field: newField }));
-                }}
-            >
+            <Button className="mt-4 cursor-pointer" onClick={addNewField}>
                 <SquarePlusIcon className="mr-2 h-4 w-4" />
                 Add Field
             </Button>
