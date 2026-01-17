@@ -19,31 +19,21 @@ import InputTypeSelect from "./inputTypeSelect";
 
 export const RenderOptionsInput = ({
     field,
-    onFieldChange,
-}: FormCreateInputProps) => {
-    const [optionNames, setOptionNames] = useState<string[]>(
-        field.options || []
-    );
+    onOptionsUpdate,
+}: FormCreateInputProps & { onOptionsUpdate?: (options: string[]) => void }) => {
+    const [optionNames, setOptionNames] = useState<string[]>(field.options || []);
 
     const deleteOption = (index: number) => {
         const updatedOptions = optionNames.filter((_, i) => i !== index);
         setOptionNames(updatedOptions);
-        onFieldChange &&
-            onFieldChange({
-                ...field!,
-                options: updatedOptions,
-            } as FormCreateField);
+        onOptionsUpdate?.(updatedOptions);
     };
 
     const updateOption = (index: number, value: string) => {
         const updatedOptions = [...optionNames];
         updatedOptions[index] = value;
         setOptionNames(updatedOptions);
-        onFieldChange &&
-            onFieldChange({
-                ...field!,
-                options: updatedOptions,
-            } as FormCreateField);
+        onOptionsUpdate?.(updatedOptions);
     };
 
     const addOption = () => {
@@ -52,17 +42,13 @@ export const RenderOptionsInput = ({
             `Option ${optionNames.length + 1}`,
         ];
         setOptionNames(updatedOptions);
-        onFieldChange &&
-            onFieldChange({
-                ...field!,
-                options: updatedOptions,
-            } as FormCreateField);
+        onOptionsUpdate?.(updatedOptions);
     };
 
     return (
         <ol className="list-decimal pl-5 flex flex-col gap-2">
             {optionNames.map((name, index) => (
-                <li key={`${field.id}-option-${index}-${name}`}>
+                <li key={`option-${index}`}>
                     <div className="flex justify-between items-center gap-2">
                         <Input
                             className="border-0"
@@ -95,7 +81,8 @@ export const RenderFieldInput = ({
     onFieldChange,
     onFieldDelete,
     onFieldDuplicate,
-}: FormCreateInputProps) => {
+    onOptionsUpdate,
+}: FormCreateInputProps & { onOptionsUpdate?: (options: string[]) => void }) => {
     const { field_type: fieldType, options } = field;
     switch (fieldType) {
         case "text":
@@ -117,7 +104,7 @@ export const RenderFieldInput = ({
             );
         case "radio":
         case "dropdown":
-            return <RenderOptionsInput {...{ field, onFieldChange }} />;
+            return <RenderOptionsInput field={field} onOptionsUpdate={onOptionsUpdate} />;
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
@@ -136,9 +123,13 @@ export default function FormCreateInput({
     );
     const [label, setLabel] = useState(field.label || "");
     const [required, setRequired] = useState(field.required || false);
-    const options = field.options || [];
+    const [options, setOptions] = useState<string[]>(field.options || []);
 
-    useEffect(() => {
+    const handleOptionsChange = (newOptions: string[]) => {
+        setOptions(newOptions);
+    };
+
+    const handleSave = () => {
         if (onFieldChange && field) {
             onFieldChange({
                 ...field,
@@ -146,9 +137,10 @@ export default function FormCreateInput({
                 field_type: selectedField,
                 required,
                 options,
+                isEditing: false,
             });
         }
-    }, [selectedField, label, required]);
+    };
 
     return (
         <div className="border rounded-lg mb-4 mx-auto px-4 py-8 overflow-y-auto flex flex-col gap-4">
@@ -170,8 +162,8 @@ export default function FormCreateInput({
             </div>
 
             <RenderFieldInput
-                field={field}
-                onFieldChange={onFieldChange}
+                field={{ ...field, options }}
+                onOptionsUpdate={handleOptionsChange}
                 onFieldDelete={onFieldDelete}
             />
             <Separator />
@@ -202,7 +194,7 @@ export default function FormCreateInput({
                     </div>
                     <div className="flex gap-2">
                         <button
-                            onClick={() => onFieldChange?.({ ...field, isEditing: !field.isEditing } )}
+                            onClick={handleSave}
                             className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-sm"
                         >
                             Save
