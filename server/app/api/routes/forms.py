@@ -50,11 +50,25 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
                                 "field": field.model_dump(),
                             }
                         )
+                    case "update_field":
+                        field = data.get("field")
+                        if not field:
+                            raise ValueError("field data is required for update_field")
+                        field_id = field.get("id")
+                        new_data = await mongo["forms"].update_one(
+                            {"_id": form_id, "fields.id": field_id},
+                            {"$set": {f"fields.$": field}},
+                        )
+                        await manager.broadcast(
+                            {
+                                "action": "update_field",
+                                "field": field,
+                            }
+                        )
                     case "remove_field":
                         field_id = data.get("field_id")
                         if not field_id:
                             raise ValueError("field_id is required for remove_field")
-                        t = await mongo["forms"].find_one({"_id": form_id})
                         data = await mongo["forms"].update_one(
                             {"_id": form_id},
                             {"$pull": {"fields": {"id": field_id}}},
@@ -63,6 +77,39 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
                             {
                                 "action": "remove_field",
                                 "field_id": field_id,
+                            }
+                        )
+                    case "duplicate_field":
+                        field_id = data.get("field_id")
+                        if not field_id:
+                            raise ValueError("field_id is required for duplicate_field")
+                        # get the field to duplicate
+                        form = await mongo["forms"].find_one({"_id": form_id})
+                        field_to_duplicate = next(
+                            (f for f in form["fields"] if f["id"] == field_id), None
+                        )
+                        index = form["fields"].index(field_to_duplicate)
+                        if not field_to_duplicate:
+                            raise ValueError("Field not found to duplicate")
+                        del field_to_duplicate["id"]
+                        new_field = FormField(**field_to_duplicate)
+                        data = await mongo["forms"].update_one(
+                            {"_id": form_id},
+                            {
+                                "$push": {
+                                    "fields": {
+                                        "$each": [new_field.model_dump(by_alias=True)],
+                                        "$position": index + 1,
+                                    }
+                                }
+                            },
+                        )
+                        print("Duplicate field data:", data)
+                        await manager.broadcast(
+                            {
+                                "action": "duplicate_field",
+                                "field": new_field.model_dump(),
+                                "index": index + 1,
                             }
                         )
 

@@ -4,11 +4,9 @@ import { useEffect, useState } from "react";
 import FormCreateInput from "./formCreateInput";
 import FormViewInput from "./formViewInput";
 import { FormCreateField } from "@/types";
-import { nanoid } from "nanoid";
 import { SquarePlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/app/utils";
-const generateId = () => nanoid(8);
 
 export default function FormCreate({ formId }: { formId: string }) {
     const [fields, setFields] = useState<FormCreateField[]>([]);
@@ -21,10 +19,35 @@ export default function FormCreate({ formId }: { formId: string }) {
 
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+
             if (!data.error) {
                 switch (data.action) {
                     case "add_field":
-                        setFields((prev) => [...prev, data.field]);
+                        setFields((prev) => [
+                            ...prev,
+                            { ...data.field, isEditing: false },
+                        ]);
+                        break;
+                    case "update_field":
+                        setFields((prev) =>
+                            prev.map((f) =>
+                                f.id === data.field.id
+                                    ? { ...data.field, isEditing: false }
+                                    : f
+                            )
+                        );
+                        break;
+                    case "duplicate_field":
+                        const index = data.index;
+                        const field = data.field;
+                        setFields((prev) => {
+                            const newFields = [...prev];
+                            newFields.splice(index, 0, {
+                                ...field,
+                                isEditing: false,
+                            });
+                            return newFields;
+                        });
                         break;
                     case "remove_field":
                         setFields((prev) =>
@@ -43,7 +66,12 @@ export default function FormCreate({ formId }: { formId: string }) {
             try {
                 const response = await api.get(`/forms/${formId}`);
                 if (response.data.fields) {
-                    setFields(response.data.fields);
+                    setFields(
+                        response.data.fields.map((field: FormCreateField) => ({
+                            ...field,
+                            isEditing: false,
+                        }))
+                    );
                 }
             } catch (error) {
                 console.error("Error fetching form data:", error);
@@ -59,6 +87,14 @@ export default function FormCreate({ formId }: { formId: string }) {
 
     const handleFieldChange = (field: FormCreateField) => {
         setFields((prev) => prev.map((f) => (f.id === field.id ? field : f)));
+
+        if (!field.isEditing) {
+            const updatedField = { ...field };
+            delete updatedField.isEditing;
+            ws?.send(
+                JSON.stringify({ action: "update_field", field: updatedField })
+            );
+        }
     };
 
     const handleFieldDelete = (fieldId: string) => {
@@ -66,16 +102,9 @@ export default function FormCreate({ formId }: { formId: string }) {
     };
 
     const handleFieldDuplicate = (field: FormCreateField) => {
-        const newField = {
-            ...field,
-            id: generateId(),
-        };
-        setFields((prev) => {
-            const index = prev.findIndex((f) => f.id === field.id);
-            const newFields = [...prev];
-            newFields.splice(index + 1, 0, newField);
-            return newFields;
-        });
+        ws?.send(
+            JSON.stringify({ action: "duplicate_field", field_id: field.id })
+        );
     };
 
     const addNewField = () => {
