@@ -3,33 +3,27 @@
 import { Input } from "@/components/ui/input";
 import { FieldType, FormViewInputProps } from "@/types";
 import { SquareIcon, PencilIcon, CircleIcon } from "lucide-react";
-export const RenderDropdownOptions = ({ names }: { names: string[] }) => {
-    return (
-        <ol className="flex flex-col gap-2 list-decimal pl-5">
-            {names.map((name, index) => (
-                <li key={index}>
-                    <div className="flex items-center gap-2">
-                        <div className="text-muted-foreground">{name}</div>
-                    </div>
-                </li>
-            ))}
-        </ol>
-    );
-};
-export const RenderRadioOptions = ({ names }: { names: string[] }) => {
-    return (
-        <ol className="flex flex-col gap-2">
-            {names.map((name, index) => (
-                <li key={index}>
-                    <div className="flex items-center gap-2">
-                        <CircleIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
-                        <div className="text-muted-foreground">{name}</div>
-                    </div>
-                </li>
-            ))}
-        </ol>
-    );
-};
+
+const RenderOptions = ({
+    names,
+    showIcon,
+}: {
+    names: string[];
+    showIcon?: boolean;
+}) => (
+    <ol
+        className={`flex flex-col gap-2 ${showIcon ? "" : "list-decimal pl-5"}`}
+    >
+        {names.map((name, index) => (
+            <li key={index} className="flex items-center gap-2">
+                {showIcon && (
+                    <CircleIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                )}
+                <span className="text-muted-foreground">{name}</span>
+            </li>
+        ))}
+    </ol>
+);
 
 const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
     switch (fieldType) {
@@ -43,17 +37,15 @@ const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
             );
         case "checkbox":
             return (
-                <>
-                    <div className="flex items-center gap-2">
-                        <SquareIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
-                        <div className="text-muted-foreground">Option</div>
-                    </div>
-                </>
+                <div className="flex items-center gap-2">
+                    <SquareIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                    <span className="text-muted-foreground">Option</span>
+                </div>
             );
         case "radio":
-            return <RenderRadioOptions names={options || []} />;
+            return <RenderOptions names={options || []} showIcon />;
         case "dropdown":
-            return <RenderDropdownOptions names={options || []} />;
+            return <RenderOptions names={options || []} />;
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
@@ -64,10 +56,8 @@ export default function FormViewInput({
     field,
     onFieldChange,
 }: FormViewInputProps) {
-    if (!field) return null;
-
     return (
-        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 overflow-y-auto flex flex-col gap-4 relative">
+        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 flex flex-col gap-4 relative">
             <button
                 onClick={() =>
                     onFieldChange?.({ ...field, isEditing: !field.isEditing })
@@ -77,14 +67,11 @@ export default function FormViewInput({
             >
                 <PencilIcon className="w-4 h-4" />
             </button>
-            <div className="flex flex-row gap-4">
-                <div className="flex gap-2">
-                    {field.label}{" "}
-                    {field.required && <div className="text-red-500">*</div>}
-                </div>
+            <div className="flex gap-2">
+                {field.label}
+                {field.required && <span className="text-red-500">*</span>}
             </div>
-
-            {renderFieldInput(field.field_type, field?.options)}
+            {renderFieldInput(field.field_type, field.options)}
         </div>
     );
 }

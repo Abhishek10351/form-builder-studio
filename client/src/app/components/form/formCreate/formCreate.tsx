@@ -20,51 +20,46 @@ export default function FormCreate({ formId }: { formId: string }) {
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
 
-            if (!data.error) {
-                switch (data.action) {
-                    case "add_field":
-                        setFields((prev) => [
-                            ...prev,
-                            { ...data.field, isEditing: false },
-                        ]);
-                        break;
-                    case "update_field":
-                        setFields((prev) =>
-                            prev.map((f) =>
-                                f.id === data.field.id
-                                    ? { ...data.field, isEditing: false }
-                                    : f
-                            )
-                        );
-                        break;
-                    case "duplicate_field":
-                        const index = data.index;
-                        const field = data.field;
-                        setFields((prev) => {
-                            const newFields = [...prev];
-                            newFields.splice(index, 0, {
-                                ...field,
-                                isEditing: false,
-                            });
-                            return newFields;
+            if (data.error) return;
+
+            switch (data.action) {
+                case "add_field":
+                    setFields((prev) => [
+                        ...prev,
+                        { ...data.field, isEditing: false },
+                    ]);
+                    break;
+                case "update_field":
+                    setFields((prev) =>
+                        prev.map((f) =>
+                            f.id === data.field.id
+                                ? { ...data.field, isEditing: false }
+                                : f
+                        )
+                    );
+                    break;
+                case "duplicate_field":
+                    setFields((prev) => {
+                        const newFields = [...prev];
+                        newFields.splice(data.index, 0, {
+                            ...data.field,
+                            isEditing: false,
                         });
-                        break;
-                    case "remove_field":
-                        setFields((prev) =>
-                            prev.filter((f) => f.id !== data.field_id)
-                        );
-                        break;
-                }
-            } else {
-                console.error("WebSocket error:", data.message);
+                        return newFields;
+                    });
+                    break;
+                case "remove_field":
+                    setFields((prev) =>
+                        prev.filter((f) => f.id !== data.field_id)
+                    );
+                    break;
             }
         };
 
         setWs(websocket);
 
-        const fetchFormData = async () => {
-            try {
-                const response = await api.get(`/forms/${formId}`);
+        api.get(`/forms/${formId}`)
+            .then((response) => {
                 if (response.data.fields) {
                     setFields(
                         response.data.fields.map((field: FormCreateField) => ({
@@ -73,12 +68,10 @@ export default function FormCreate({ formId }: { formId: string }) {
                         }))
                     );
                 }
-            } catch (error) {
-                console.error("Error fetching form data:", error);
-            }
-        };
-
-        fetchFormData();
+            })
+            .catch((error) =>
+                console.error("Error fetching form data:", error)
+            );
 
         return () => {
             websocket.close();
@@ -89,48 +82,52 @@ export default function FormCreate({ formId }: { formId: string }) {
         setFields((prev) => prev.map((f) => (f.id === field.id ? field : f)));
 
         if (!field.isEditing) {
-            const updatedField = { ...field };
-            delete updatedField.isEditing;
+            const { isEditing, ...updatedField } = field;
             ws?.send(
                 JSON.stringify({ action: "update_field", field: updatedField })
             );
         }
     };
 
-    const handleFieldDelete = (fieldId: string) => {
-        ws?.send(JSON.stringify({ action: "remove_field", field_id: fieldId }));
-    };
-
-    const handleFieldDuplicate = (field: FormCreateField) => {
-        ws?.send(
-            JSON.stringify({ action: "duplicate_field", field_id: field.id })
-        );
-    };
-
-    const addNewField = () => {
-        ws?.send(JSON.stringify({ action: "add_field" }));
-    };
-
     return (
         <div className="shadow-lg w-full max-w-2xl mx-auto p-6 mt-20">
-            {fields.map((field) => (
-                <div key={field.id}>
-                    {field.isEditing ? (
-                        <FormCreateInput
-                            field={field}
-                            onFieldChange={handleFieldChange}
-                            onFieldDelete={handleFieldDelete}
-                            onFieldDuplicate={handleFieldDuplicate}
-                        />
-                    ) : (
-                        <FormViewInput
-                            field={field}
-                            onFieldChange={handleFieldChange}
-                        />
-                    )}
-                </div>
-            ))}
-            <Button className="mt-4 cursor-pointer" onClick={addNewField}>
+            {fields.map((field) =>
+                field.isEditing ? (
+                    <FormCreateInput
+                        key={field.id}
+                        field={field}
+                        onFieldChange={handleFieldChange}
+                        onFieldDelete={(fieldId) =>
+                            ws?.send(
+                                JSON.stringify({
+                                    action: "remove_field",
+                                    field_id: fieldId,
+                                })
+                            )
+                        }
+                        onFieldDuplicate={(field) =>
+                            ws?.send(
+                                JSON.stringify({
+                                    action: "duplicate_field",
+                                    field_id: field.id,
+                                })
+                            )
+                        }
+                    />
+                ) : (
+                    <FormViewInput
+                        key={field.id}
+                        field={field}
+                        onFieldChange={handleFieldChange}
+                    />
+                )
+            )}
+            <Button
+                className="mt-4"
+                onClick={() =>
+                    ws?.send(JSON.stringify({ action: "add_field" }))
+                }
+            >
                 <SquarePlusIcon className="mr-2 h-4 w-4" />
                 Add Field
             </Button>

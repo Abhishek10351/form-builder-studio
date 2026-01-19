@@ -1,17 +1,10 @@
 "use client";
 
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import {
-    TrashIcon,
-    EllipsisVerticalIcon,
-    CopyIcon,
-    XIcon,
-    CircleIcon,
-    SquareIcon,
-} from "lucide-react";
+import { TrashIcon, CopyIcon, XIcon, SquareIcon } from "lucide-react";
 import TextareaAutoSize from "react-textarea-autosize";
 import { Input } from "@/components/ui/input";
 import { FieldType, FormCreateInputProps, FormCreateField } from "@/types";
@@ -20,27 +13,14 @@ import InputTypeSelect from "./inputTypeSelect";
 export const RenderOptionsInput = ({
     field,
     onOptionsUpdate,
-}: FormCreateInputProps & { onOptionsUpdate?: (options: string[]) => void }) => {
-    const [optionNames, setOptionNames] = useState<string[]>(field.options || []);
+}: FormCreateInputProps & {
+    onOptionsUpdate?: (options: string[]) => void;
+}) => {
+    const [optionNames, setOptionNames] = useState<string[]>(
+        field.options || []
+    );
 
-    const deleteOption = (index: number) => {
-        const updatedOptions = optionNames.filter((_, i) => i !== index);
-        setOptionNames(updatedOptions);
-        onOptionsUpdate?.(updatedOptions);
-    };
-
-    const updateOption = (index: number, value: string) => {
-        const updatedOptions = [...optionNames];
-        updatedOptions[index] = value;
-        setOptionNames(updatedOptions);
-        onOptionsUpdate?.(updatedOptions);
-    };
-
-    const addOption = () => {
-        const updatedOptions = [
-            ...optionNames,
-            `Option ${optionNames.length + 1}`,
-        ];
+    const updateOptions = (updatedOptions: string[]) => {
         setOptionNames(updatedOptions);
         onOptionsUpdate?.(updatedOptions);
     };
@@ -53,21 +33,32 @@ export const RenderOptionsInput = ({
                         <Input
                             className="border-0"
                             value={name}
-                            onChange={(e) =>
-                                updateOption(index, e.target.value)
-                            }
+                            onChange={(e) => {
+                                const updated = [...optionNames];
+                                updated[index] = e.target.value;
+                                updateOptions(updated);
+                            }}
                         />
                         <XIcon
                             className="w-4 h-4 cursor-pointer hover:text-red-500 basis-4"
-                            onClick={() => deleteOption(index)}
+                            onClick={() =>
+                                updateOptions(
+                                    optionNames.filter((_, i) => i !== index)
+                                )
+                            }
                         />
                     </div>
                 </li>
             ))}
-            <li className="mt-2 cursor-grab">
+            <li className="mt-2">
                 <button
                     className="text-primary underline cursor-pointer"
-                    onClick={addOption}
+                    onClick={() =>
+                        updateOptions([
+                            ...optionNames,
+                            `Option ${optionNames.length + 1}`,
+                        ])
+                    }
                 >
                     Add Option
                 </button>
@@ -78,12 +69,12 @@ export const RenderOptionsInput = ({
 
 export const RenderFieldInput = ({
     field,
-    onFieldChange,
-    onFieldDelete,
-    onFieldDuplicate,
     onOptionsUpdate,
-}: FormCreateInputProps & { onOptionsUpdate?: (options: string[]) => void }) => {
-    const { field_type: fieldType, options } = field;
+}: Pick<FormCreateInputProps, "field"> & {
+    onOptionsUpdate?: (options: string[]) => void;
+}) => {
+    const { field_type: fieldType } = field;
+
     switch (fieldType) {
         case "text":
             return (
@@ -95,16 +86,19 @@ export const RenderFieldInput = ({
             );
         case "checkbox":
             return (
-                <>
-                    <div className="flex items-center gap-2">
-                        <SquareIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
-                        <div className="text-muted-foreground">Option</div>
-                    </div>
-                </>
+                <div className="flex items-center gap-2">
+                    <SquareIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                    <div className="text-muted-foreground">Option</div>
+                </div>
             );
         case "radio":
         case "dropdown":
-            return <RenderOptionsInput field={field} onOptionsUpdate={onOptionsUpdate} />;
+            return (
+                <RenderOptionsInput
+                    field={field}
+                    onOptionsUpdate={onOptionsUpdate}
+                />
+            );
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
@@ -130,16 +124,14 @@ export default function FormCreateInput({
     };
 
     const handleSave = () => {
-        if (onFieldChange && field) {
-            onFieldChange({
-                ...field,
-                label,
-                field_type: selectedField,
-                required,
-                options,
-                isEditing: false,
-            });
-        }
+        onFieldChange?.({
+            ...field,
+            label,
+            field_type: selectedField,
+            required,
+            options,
+            isEditing: false,
+        });
     };
 
     return (
@@ -164,23 +156,18 @@ export default function FormCreateInput({
             <RenderFieldInput
                 field={{ ...field, options }}
                 onOptionsUpdate={handleOptionsChange}
-                onFieldDelete={onFieldDelete}
             />
             <Separator />
             <div className="flex items-center flex-row">
                 <div className="flex flex-row items-center grow gap-4">
-                    <span title="Duplicate field">
-                        <CopyIcon
-                            className="cursor-pointer hover:text-blue-500 w-5 aspect-square"
-                            onClick={() => onFieldDuplicate?.(field)}
-                        />
-                    </span>
-                    <span title="Delete field">
-                        <TrashIcon
-                            className="cursor-pointer hover:text-red-500 w-5 aspect-square"
-                            onClick={() => onFieldDelete?.(field.id)}
-                        />
-                    </span>
+                    <CopyIcon
+                        className="cursor-pointer hover:text-blue-500 w-5 h-5"
+                        onClick={() => onFieldDuplicate?.(field)}
+                    />
+                    <TrashIcon
+                        className="cursor-pointer hover:text-red-500 w-5 h-5"
+                        onClick={() => onFieldDelete?.(field.id)}
+                    />
                 </div>
                 <div className="flex flex-row mx-4 basis-8 gap-4">
                     <Separator className="mx4" orientation="vertical" />
@@ -192,15 +179,12 @@ export default function FormCreateInput({
                         />
                         <Label htmlFor="required-switch">Required</Label>
                     </div>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={handleSave}
-                            className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-sm"
-                        >
-                            Save
-                        </button>
-                        <EllipsisVerticalIcon className="cursor-pointer" />
-                    </div>
+                    <button
+                        onClick={handleSave}
+                        className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-sm"
+                    >
+                        Save
+                    </button>
                 </div>
             </div>
         </div>

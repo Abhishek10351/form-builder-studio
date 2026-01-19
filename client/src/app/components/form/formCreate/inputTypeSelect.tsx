@@ -18,11 +18,8 @@ export default function InputTypeSelect({
     onChange,
 }: InputTypeSelectProps) {
     return (
-        <Select
-            value={value}
-            onValueChange={(value) => onChange(value)}
-        >
-            <SelectTrigger className="w-[8rem] rounded-md p-4 h-auto">
+        <Select value={value} onValueChange={onChange}>
+            <SelectTrigger className="w-32 rounded-md p-4 h-auto">
                 <SelectValue placeholder="Select field type" />
             </SelectTrigger>
             <SelectContent>

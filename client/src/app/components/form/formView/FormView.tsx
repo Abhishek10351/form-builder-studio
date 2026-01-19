@@ -40,26 +40,23 @@ export default function FormView() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchForms = async () => {
-            try {
-                setIsLoading(true);
-                const response = await api.get("/forms/");
-                const formattedForms = response.data.map((form: any) => ({
-                    formId: form._id || form.id,
-                    title: form.title,
-                    description: form.description,
-                }));
-                setForms(formattedForms);
+        setIsLoading(true);
+        api.get("/forms/")
+            .then((response) => {
+                setForms(
+                    response.data.map((form: any) => ({
+                        formId: form._id || form.id,
+                        title: form.title,
+                        description: form.description,
+                    }))
+                );
                 setError(null);
-            } catch (err) {
+            })
+            .catch((err) => {
                 console.error("Failed to fetch forms:", err);
                 setError("Failed to load forms. Please try again later.");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchForms();
+            })
+            .finally(() => setIsLoading(false));
     }, []);
 
     return (
@@ -67,11 +64,13 @@ export default function FormView() {
             <CreateFormCard />
             <h1 className="text-3xl font-bold mb-6">Recent Forms</h1>
 
-            {isLoading && <LoadingState />}
-            {error && <ErrorState message={error} />}
-            {!isLoading && !error && forms.length === 0 && <EmptyState />}
-
-            {!isLoading && !error && (
+            {isLoading ? (
+                <LoadingState />
+            ) : error ? (
+                <ErrorState message={error} />
+            ) : forms.length === 0 ? (
+                <EmptyState />
+            ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
                     {forms.map((form) => (
                         <FormCard key={form.formId} {...form} />
