@@ -4,26 +4,17 @@ import api from "@/app/utils/api";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-
 export default function CreateFormPage() {
     const router = useRouter();
 
-    const createForm = async () => {
-        try {
-            const response = await api.post("/forms/", {});
-            const {data} = response;
-            const newFormId = data.id;
-            console.log("Form created with ID:", newFormId);
-            router.push(`/form/${newFormId}/create`);
-        } catch (error) {
-            console.error("Failed to create form:", error);
-            alert("Failed to create form. Please try again.");
-        }
-    };
-
     useEffect(() => {
-        createForm();
-    }, []);
+        api.post("/forms/", {})
+            .then((response) => router.push(`/form/${response.data.id}/create`))
+            .catch((error) => {
+                console.error("Failed to create form:", error);
+                alert("Failed to create form. Please try again.");
+            });
+    }, [router]);
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">

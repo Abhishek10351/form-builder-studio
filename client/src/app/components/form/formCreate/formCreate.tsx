@@ -19,7 +19,6 @@ export default function FormCreate({ formId }: { formId: string }) {
 
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-
             if (data.error) return;
 
             switch (data.action) {
@@ -59,10 +58,10 @@ export default function FormCreate({ formId }: { formId: string }) {
         setWs(websocket);
 
         api.get(`/forms/${formId}`)
-            .then((response) => {
-                if (response.data.fields) {
+            .then(({ data }) => {
+                if (data.fields) {
                     setFields(
-                        response.data.fields.map((field: FormCreateField) => ({
+                        data.fields.map((field: FormCreateField) => ({
                             ...field,
                             isEditing: false,
                         }))
