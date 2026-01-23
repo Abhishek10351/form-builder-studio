@@ -38,6 +38,21 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
                         await manager.send_personal_message(
                             {"action": "pong"}, websocket
                         )
+                    case "update_form":
+                        form_data = data.get("data", {})
+                        update_data = {}
+                        if "title" in form_data:
+                            update_data["title"] = form_data["title"]
+                        if "description" in form_data:
+                            update_data["description"] = form_data["description"]
+
+                        if update_data:
+                            await mongo["forms"].update_one(
+                                {"_id": form_id}, {"$set": update_data}
+                            )
+                            await manager.broadcast(
+                                {"action": "update_form", "data": update_data}
+                            )
                     case "add_field":
                         field = FormField()
                         data = await mongo["forms"].update_one(

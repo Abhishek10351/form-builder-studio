@@ -7,7 +7,7 @@ interface GetFormPageProps {
 export default async function GetFormPage({ params }: GetFormPageProps) {
     const { formId } = await params;
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen flex flex-col items-center mt-20 px-4">
             <FormCreate formId={formId} />
         </div>
     );
