@@ -38,6 +38,15 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
                         await manager.send_personal_message(
                             {"action": "pong"}, websocket
                         )
+                    case "publish_form":
+                        print("Publish form action data:", data)
+                        publish_status = data.get("published")
+                        await mongo["forms"].update_one(
+                            {"_id": form_id}, {"$set": {"published": publish_status}}
+                        )
+                        await manager.broadcast(
+                            {"action": "publish_form", "published": publish_status}
+                        )
                     case "update_form":
                         form_data = data.get("data", {})
                         update_data = {}
@@ -147,7 +156,13 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
 async def get_form(req: Request, form_id: str):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-    form = await forms.find_one({"_id": form_id})
+    if user.is_superuser:
+        form = await forms.find_one({"_id": form_id})
+    else:
+        form = await forms.find_one(
+            {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
+        )
+
     if not form:
         return Response(
             content=json.dumps({"message": "Form not found"}),

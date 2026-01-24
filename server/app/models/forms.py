@@ -53,6 +53,7 @@ class Form(BaseModel):
     fields: list[FormField] = Field(default_factory=list)
     owner_id: EmailStr = Field(default = None)
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
+    published: bool = Field(default=False)
 
     model_config = {
         "populate_by_name": True,

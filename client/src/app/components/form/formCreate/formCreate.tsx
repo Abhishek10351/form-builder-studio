@@ -10,9 +10,10 @@ import { Separator } from "@/components/ui/separator";
 import { api } from "@/app/utils";
 
 export default function FormCreate({ formId }: { formId: string }) {
-    const [fields, setFields] = useState<FormCreateField[]>([]);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [fields, setFields] = useState<FormCreateField[]>([]);
+    const [published, setPublished] = useState(false);
     const [ws, setWs] = useState<WebSocket | null>(null);
     const titleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const descriptionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -32,6 +33,8 @@ export default function FormCreate({ formId }: { formId: string }) {
                         setTitle(data.data.title);
                     if (data.data?.description !== undefined)
                         setDescription(data.data.description);
+                    if (data.data?.published !== undefined)
+                        setPublished(data.data.published);
                     break;
                 case "add_field":
                     setFields((prev) => [
@@ -62,6 +65,10 @@ export default function FormCreate({ formId }: { formId: string }) {
                     setFields((prev) =>
                         prev.filter((f) => f.id !== data.field_id)
                     );
+                    break;
+                case "publish_form":
+                    setPublished(data.published);
+
                     break;
             }
         };
@@ -128,26 +135,65 @@ export default function FormCreate({ formId }: { formId: string }) {
         }, 500);
     };
 
+    const fireConfetti = async (button: HTMLButtonElement) => {
+        const rect = button.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        
+        const { default: confetti } = await import('canvas-confetti');
+        await confetti({
+            particleCount: 100,
+            spread: 100,
+            scalar: 1.2,
+            origin: {
+                x: x / window.innerWidth,
+                y: y / window.innerHeight,
+            },
+        });
+    };
+
+    const handlePublish = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (!published) {
+            fireConfetti(event.currentTarget);
+        }
+        ws?.send(
+            JSON.stringify({ action: "publish_form", published: !published })
+        );
+    };
+
     return (
-        <div className="shadow-lg border rounded-md w-full max-w-2xl mx-auto my-10 p-6 flex gap-6 flex-col">
-            <div className="mb-6 space-y-4">
-                <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => updateTitle(e.target.value)}
-                    placeholder="Form Title"
-                    className="w-full text-2xl font-bold border-0 border-b-2 border-transparent hover:border-gray-300 focus:border-primary focus:outline-none px-2 py-1 transition-colors"
-                />
-                <textarea
-                    value={description}
-                    onChange={(e) => updateDescription(e.target.value)}
-                    placeholder="Form Description"
-                    className="w-full border-0 border-b border-transparent hover:border-gray-300 focus:border-primary focus:outline-none px-2 py-1 resize-none transition-colors"
-                    rows={2}
-                />
+        <div className="shadow-lg border rounded-lg w-full max-w-3xl mx-auto my-8 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 px-6 py-4 border-b flex items-center justify-between">
+                <div className="flex-1">
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => updateTitle(e.target.value)}
+                        placeholder="Untitled Form"
+                        className="w-full text-2xl font-bold bg-transparent border-0 focus:outline-none placeholder:text-gray-400"
+                    />
+                    <textarea
+                        value={description}
+                        onChange={(e) => updateDescription(e.target.value)}
+                        placeholder="Add a description to your form"
+                        className="w-full mt-2 text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-gray-400"
+                        rows={2}
+                    />
+                </div>
+                <Button
+                    onClick={handlePublish}
+                    size="lg"
+                    className={`ml-4 font-semibold transition-all cursor-pointer duration-200 ${
+                        !published
+                            ? "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}>
+                    {published ? "Unpublish" : "Publish Form"}
+                </Button>
             </div>
-            <Separator />
-            <div className="">
+            <div className="p-6">
+                <Separator className="mb-6" />
+            <div className="space-y-20">
                 {fields.map((field) =>
                     field.isEditing ? (
                         <FormCreateInput
@@ -180,14 +226,16 @@ export default function FormCreate({ formId }: { formId: string }) {
                     )
                 )}
                 <Button
-                    className="mt-4 cursor-pointer"
+                    variant="outline"
+                    className="w-full mt-6 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer"
                     onClick={() =>
                         ws?.send(JSON.stringify({ action: "add_field" }))
                     }
                 >
-                    <SquarePlusIcon className="mr-2 h-4 w-4" />
+                    <SquarePlusIcon className="mr-2 h-5 w-5" />
                     Add Field
                 </Button>
+            </div>
             </div>
         </div>
     );

@@ -154,7 +154,7 @@ export default function FormCreateInput({
             </div>
 
             <RenderFieldInput
-                field={{ ...field, options }}
+                field={{ ...field, field_type: selectedField, options }}
                 onOptionsUpdate={handleOptionsChange}
             />
             <Separator />
