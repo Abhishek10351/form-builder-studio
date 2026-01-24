@@ -7,6 +7,7 @@ import { FormCreateField } from "@/types";
 import { SquarePlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ConfettiPublishButton } from "@/components/ui/confetti-publish-button";
 import { api } from "@/app/utils";
 
 export default function FormCreate({ formId }: { formId: string }) {
@@ -135,27 +136,7 @@ export default function FormCreate({ formId }: { formId: string }) {
         }, 500);
     };
 
-    const fireConfetti = async (button: HTMLButtonElement) => {
-        const rect = button.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-        
-        const { default: confetti } = await import('canvas-confetti');
-        await confetti({
-            particleCount: 100,
-            spread: 100,
-            scalar: 1.2,
-            origin: {
-                x: x / window.innerWidth,
-                y: y / window.innerHeight,
-            },
-        });
-    };
-
-    const handlePublish = (event: React.MouseEvent<HTMLButtonElement>) => {
-        if (!published) {
-            fireConfetti(event.currentTarget);
-        }
+    const handlePublish = () => {
         ws?.send(
             JSON.stringify({ action: "publish_form", published: !published })
         );
@@ -180,16 +161,10 @@ export default function FormCreate({ formId }: { formId: string }) {
                         rows={2}
                     />
                 </div>
-                <Button
+                <ConfettiPublishButton
+                    published={published}
                     onClick={handlePublish}
-                    size="lg"
-                    className={`ml-4 font-semibold transition-all cursor-pointer duration-200 ${
-                        !published
-                            ? "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}>
-                    {published ? "Unpublish" : "Publish Form"}
-                </Button>
+                />
             </div>
             <div className="p-6">
                 <Separator className="mb-6" />
