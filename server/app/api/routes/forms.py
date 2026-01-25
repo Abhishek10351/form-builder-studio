@@ -7,15 +7,16 @@ from fastapi import (
     Query,
 )
 from typing import Annotated
-from models import Form, FormField, User
+from models import Form, FormField, User, Submission, SubmissionField
 import json
 import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, BeforeValidator
 from typing import Optional
-from utils import login_required
 import nanoid
 from utils.manager import ConnectionManager
-from utils import websocket_login_required, has_update_permission
+from utils import websocket_login_required, has_update_permission, login_required, generate_random_id
+
+PyObjectId = Annotated[str, BeforeValidator(str)]
 
 manager = ConnectionManager()
 
@@ -39,7 +40,6 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
                             {"action": "pong"}, websocket
                         )
                     case "publish_form":
-                        print("Publish form action data:", data)
                         publish_status = data.get("published")
                         await mongo["forms"].update_one(
                             {"_id": form_id}, {"$set": {"published": publish_status}}
@@ -152,16 +152,26 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
     response_model=Form,
     status_code=200,
 )
-@login_required
 async def get_form(req: Request, form_id: str):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-    if user.is_superuser:
-        form = await forms.find_one({"_id": form_id})
-    else:
+    # if user and user.is_superuser:
+    #     form = await forms.find_one({"_id": form_id})
+    # else:
+    #     form = await forms.find_one(
+    #         {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
+    #     )
+    if not user :
         form = await forms.find_one(
-            {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
+            {"_id": form_id, "published": True}
         )
+    else:
+        if user.is_superuser:
+            form = await forms.find_one({"_id": form_id})
+        else:
+            form = await forms.find_one(
+                {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
+            )
 
     if not form:
         return Response(
@@ -183,7 +193,6 @@ class FormsListResponse(BaseModel):
 async def get_forms(req: Request):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-    # form_list = await forms.find().to_list(length=100)
     if user and user.is_superuser:
         cursor = forms.find()
     else:
@@ -197,7 +206,7 @@ async def get_forms(req: Request):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-# @login_required
+@login_required
 async def create_form(req: Request, form: Form):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
@@ -232,3 +241,33 @@ async def delete_form(req: Request, form_id: str):
         )
     await forms.delete_one({"_id": form_id})
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+class SubmissionData(BaseModel):
+    id: Optional[PyObjectId] = Field(default_factory=generate_random_id, alias="_id")
+    data: list[SubmissionField] = Field(default_factory=list)
+
+
+@router.post("/{form_id}/submit", response_model=Form, status_code=200)
+async def submit_form(req: Request, form_id: str, submission_data: SubmissionData):
+
+    mongo = req.app.mongodb
+    forms = mongo["forms"]
+    submissions = mongo["submissions"]
+    form = forms.find_one({"_id": form_id, "published": True})
+    if not form:
+        return Response(
+            content=json.dumps({"message": "Form not found or not published"}),
+            status_code=404,
+            media_type="application/json",
+        )
+    submission_dict = submission_data.model_dump(by_alias=True)
+    submission = Submission(**submission_dict, form_id=form_id)
+    submission_dict = submission.model_dump(by_alias=True)
+
+    result = await submissions.insert_one(submission_dict)
+    return Response(
+        content=Submission.model_validate(submission_dict).model_dump_json(),
+        status_code=200,
+        media_type="application/json",
+    )

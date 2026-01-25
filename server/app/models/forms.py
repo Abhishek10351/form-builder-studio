@@ -68,10 +68,10 @@ class SubmissionField(BaseModel):
 
 class Submission(BaseModel):
     id: Optional[PyObjectId] = Field(default_factory=generate_random_id, alias="_id")
-    form_id: PyObjectId
+    form_id: str = Field()
     data: list[SubmissionField] = Field(default_factory=list)
-    submitted_by: EmailStr | None = None
-    submitted_at: str
+    # submitted_by: EmailStr | None = None
+    # submitted_at: str
 
     class Config:
         populate_by_name = True

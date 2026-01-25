@@ -29,5 +29,5 @@ export default function FormClient({ formId }: { formId: string }) {
             </div>
         );
 
-    return <FormSubmitPage {...form} />;
+    return <FormSubmitPage formId={formId} {...form} />;
 }
