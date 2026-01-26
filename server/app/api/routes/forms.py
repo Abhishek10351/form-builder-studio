@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Request, Response, status
 from fastapi import (
+    APIRouter,
+    Request,
+    Response,
     Depends,
     WebSocket,
     WebSocketException,
     WebSocketDisconnect,
     Query,
+    status,
 )
 from typing import Annotated
 from models import Form, FormField, User, Submission, SubmissionField
@@ -13,8 +16,14 @@ import datetime
 from pydantic import BaseModel, Field, BeforeValidator
 from typing import Optional
 import nanoid
-from utils.manager import ConnectionManager
-from utils import websocket_login_required, has_update_permission, login_required, generate_random_id
+from utils import (
+    websocket_login_required,
+    has_update_permission,
+    login_required,
+    generate_random_id,
+    ConnectionManager,
+    check_submission_data,
+)
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
@@ -128,7 +137,6 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
                                 }
                             },
                         )
-                        print("Duplicate field data:", data)
                         await manager.broadcast(
                             {
                                 "action": "duplicate_field",
@@ -155,16 +163,9 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
 async def get_form(req: Request, form_id: str):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-    # if user and user.is_superuser:
-    #     form = await forms.find_one({"_id": form_id})
-    # else:
-    #     form = await forms.find_one(
-    #         {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
-    #     )
-    if not user :
-        form = await forms.find_one(
-            {"_id": form_id, "published": True}
-        )
+
+    if not user:
+        form = await forms.find_one({"_id": form_id, "published": True})
     else:
         if user.is_superuser:
             form = await forms.find_one({"_id": form_id})
@@ -191,7 +192,7 @@ class FormsListResponse(BaseModel):
 @router.get("/", response_model=list[FormsListResponse], status_code=200)
 @login_required
 async def get_forms(req: Request):
-    user: User | None = req.state.user
+    user: User = req.state.user
     forms = req.app.mongodb["forms"]
     if user and user.is_superuser:
         cursor = forms.find()
@@ -254,7 +255,7 @@ async def submit_form(req: Request, form_id: str, submission_data: SubmissionDat
     mongo = req.app.mongodb
     forms = mongo["forms"]
     submissions = mongo["submissions"]
-    form = forms.find_one({"_id": form_id, "published": True})
+    form = await forms.find_one({"_id": form_id, "published": True})
     if not form:
         return Response(
             content=json.dumps({"message": "Form not found or not published"}),
@@ -262,10 +263,16 @@ async def submit_form(req: Request, form_id: str, submission_data: SubmissionDat
             media_type="application/json",
         )
     submission_dict = submission_data.model_dump(by_alias=True)
+    if not check_submission_data(Form.model_validate(form), submission_dict["data"]):
+        return Response(
+            content=json.dumps({"message": "Invalid submission data"}),
+            status_code=400,
+            media_type="application/json",
+        )
     submission = Submission(**submission_dict, form_id=form_id)
     submission_dict = submission.model_dump(by_alias=True)
 
-    result = await submissions.insert_one(submission_dict)
+    # result = await submissions.insert_one(submission_dict)
     return Response(
         content=Submission.model_validate(submission_dict).model_dump_json(),
         status_code=200,
