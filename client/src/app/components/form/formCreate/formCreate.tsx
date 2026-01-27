@@ -24,9 +24,20 @@ export default function FormCreate({ formId }: { formId: string }) {
             `ws://127.0.0.1:8000/forms/ws/${formId}`
         );
 
+        websocket.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+
+        websocket.onclose = () => {
+            console.log("WebSocket connection closed");
+        };
+
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            if (data.error) return;
+            if (data.error) {
+                console.error("WebSocket error:", data.error);
+                return;
+            }
 
             switch (data.action) {
                 case "update_form":
@@ -78,9 +89,10 @@ export default function FormCreate({ formId }: { formId: string }) {
 
         api.get(`/forms/${formId}`)
             .then(({ data }) => {
-                if (data.title) setTitle(data.title);
-                if (data.description) setDescription(data.description);
-                if (data.fields) {
+                if (data.title !== undefined) setTitle(data.title);
+                if (data.description !== undefined) setDescription(data.description);
+                if (data.published !== undefined) setPublished(data.published);
+                if (data.fields && Array.isArray(data.fields)) {
                     setFields(
                         data.fields.map((field: FormCreateField) => ({
                             ...field,
@@ -94,6 +106,8 @@ export default function FormCreate({ formId }: { formId: string }) {
             );
 
         return () => {
+            if (titleTimeoutRef.current) clearTimeout(titleTimeoutRef.current);
+            if (descriptionTimeoutRef.current) clearTimeout(descriptionTimeoutRef.current);
             websocket.close();
         };
     }, [formId]);

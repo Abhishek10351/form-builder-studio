@@ -27,7 +27,7 @@ export default function FormSubmitField({
                     <Input
                         type={field_type}
                         required={required}
-                        value={value as string}
+                        value={value as string | ""}
                         onChange={(e) => onChange?.(e.target.value)}
                     />
                 );
@@ -37,7 +37,7 @@ export default function FormSubmitField({
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id={`checkbox-${label}`}
-                            checked={value as boolean}
+                            checked={value as boolean | false}
                             onCheckedChange={(checked) =>
                                 onChange?.(checked as boolean)
                             }
@@ -53,7 +53,7 @@ export default function FormSubmitField({
             case "radio":
                 return (
                     <RadioGroup
-                        value={value as string}
+                        value={value as string | ""}
                         onValueChange={(value) => onChange?.(value)}
                     >
                         {options?.map((option, index) => (
@@ -79,7 +79,7 @@ export default function FormSubmitField({
             case "dropdown":
                 return (
                     <Select
-                        value={value as string}
+                        value={value as string | ""}
                         onValueChange={(value) => onChange?.(value)}
                     >
                         <SelectTrigger>

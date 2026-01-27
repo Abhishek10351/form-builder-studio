@@ -14,15 +14,21 @@ export default function FormSubmitPage({
     description,
     fields,
 }: FormSubmit & { formId: string }) {
-    const [formData, setFormData] = useState<FormSubmitFieldProps[]>(fields);
+    const [formData, setFormData] = useState<FormSubmitFieldProps[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
+        if (!fields || fields.length === 0) return;
+        
         const initialFormData = fields.map((field) => ({
             ...field,
-            value: field.field_type === "checkbox" ? false : "",
+            value: field.field_type === "checkbox" 
+                ? false 
+                : field.field_type === "radio" || field.field_type === "dropdown"
+                ? ""
+                : "",
         }));
         setFormData(initialFormData);
     }, [fields]);
@@ -42,13 +48,73 @@ export default function FormSubmitPage({
         e.preventDefault();
         setError(null);
 
-        // Validate required fields
-        const missingFields = formData.filter(
-            (field) => field.required && (!field.value || field.value === "")
-        );
+        if (!formData || formData.length === 0) {
+            setError("No form data to submit");
+            return;
+        }
 
-        if (missingFields.length > 0) {
-            setError("Please fill in all required fields");
+        // Validate and format data
+        const validationErrors: string[] = [];
+        const formattedData = formData
+            .map((field) => {
+                // Skip validation for non-required fields with empty values
+                if (!field.required && (!field.value || field.value === "")) {
+                    return null;
+                }
+
+                // Validate required fields
+                if (field.required) {
+                    const value = field.value;
+                    let isEmpty = false;
+
+                    if (value === null || value === undefined) {
+                        isEmpty = true;
+                    } else if (typeof value === "boolean") {
+                        isEmpty = false; // checkbox always has a value
+                    } else if (typeof value === "string") {
+                        isEmpty = value.trim() === "";
+                    } else if (Array.isArray(value)) {
+                        isEmpty = value.length === 0;
+                    }
+
+                    if (isEmpty) {
+                        validationErrors.push(
+                            field.label || `Field ${field.id}`
+                        );
+                        return null;
+                    }
+                }
+
+                // Format the value based on field type
+                let formattedValue = field.value;
+                
+                if (field.field_type === "text" || field.field_type === "dropdown") {
+                    // Trim whitespace from text fields
+                    formattedValue = typeof field.value === "string" 
+                        ? field.value.trim() 
+                        : field.value;
+                } else if (field.field_type === "date") {
+                    // Ensure date is in proper format
+                    formattedValue = field.value;
+                } else if (field.field_type === "checkbox") {
+                    // Ensure boolean value
+                    formattedValue = Boolean(field.value);
+                } else if (field.field_type === "radio") {
+                    // Ensure string value
+                    formattedValue = String(field.value || "");
+                }
+
+                return {
+                    field_id: field.id,
+                    value: formattedValue,
+                };
+            })
+            .filter((item) => item !== null);
+
+        if (validationErrors.length > 0) {
+            setError(
+                `Please fill in all required fields: ${validationErrors.join(", ")}`
+            );
             return;
         }
 
@@ -56,17 +122,14 @@ export default function FormSubmitPage({
 
         try {
             const submissionData = {
-                data: formData.map((field) => ({
-                    field_id: field.id,
-                    value: field.value,
-                })),
+                data: formattedData,
             };
 
             await api.post(`/forms/${formId}/submit`, submissionData);
             
             // Show success message and redirect
             alert("Form submitted successfully!");
-            router.push("/forms");
+            // router.push("/forms");
         } catch (err: any) {
             console.error("Submission error:", err);
             setError(
@@ -94,9 +157,9 @@ export default function FormSubmitPage({
                 </div>
             )}
             <form className="space-y-4" onSubmit={handleSubmit}>
-                {formData.map((field, index) => (
+                {formData.map((field) => (
                     <FormField
-                        key={index}
+                        key={field.id}
                         {...field}
                         onChange={(value: FormSubmitValue) =>
                             updateFieldValue(field.id!, value)
@@ -105,7 +168,7 @@ export default function FormSubmitPage({
                 ))}
                 <div className="pt-6">
                     <Button
-                        type="submit"
+                        type="button"
                         className="w-full cursor-pointer"
                         disabled={isSubmitting}
                     >
