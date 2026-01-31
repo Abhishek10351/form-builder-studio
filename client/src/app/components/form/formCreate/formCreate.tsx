@@ -158,7 +158,7 @@ export default function FormCreate({ formId }: { formId: string }) {
 
     return (
         <div className="shadow-lg border rounded-lg w-full max-w-3xl mx-auto my-8 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 px-6 py-4 border-b flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-300 to-indigo-400 dark:from-gray-800 dark:to-gray-900 px-6 py-4 border-b flex items-center justify-between">
                 <div className="flex-1">
                     <input
                         type="text"
