@@ -44,11 +44,18 @@ export default function FormView() {
         api.get("/forms/")
             .then((response) => {
                 setForms(
-                    response.data.map((form: any) => ({
-                        formId: form._id || form.id,
-                        title: form.title,
-                        description: form.description,
-                    }))
+                    response.data.map(
+                        (form: {
+                            _id?: string;
+                            id?: string;
+                            title?: string;
+                            description?: string;
+                        }) => ({
+                            formId: form._id || form.id,
+                            title: form.title,
+                            description: form.description,
+                        })
+                    )
                 );
                 setError(null);
             })

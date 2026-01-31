@@ -6,7 +6,6 @@ import { FormSubmit } from "@/types";
 import { useEffect, useState } from "react";
 import { FormSubmitFieldProps, FormSubmitValue } from "@/types";
 import { api } from "@/app/utils";
-import { useRouter } from "next/navigation";
 
 export default function FormSubmitPage({
     formId,
@@ -17,18 +16,19 @@ export default function FormSubmitPage({
     const [formData, setFormData] = useState<FormSubmitFieldProps[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
 
     useEffect(() => {
         if (!fields || fields.length === 0) return;
-        
+
         const initialFormData = fields.map((field) => ({
             ...field,
-            value: field.field_type === "checkbox" 
-                ? false 
-                : field.field_type === "radio" || field.field_type === "dropdown"
-                ? ""
-                : "",
+            value:
+                field.field_type === "checkbox"
+                    ? false
+                    : field.field_type === "radio" ||
+                      field.field_type === "dropdown"
+                    ? ""
+                    : "",
         }));
         setFormData(initialFormData);
     }, [fields]);
@@ -87,12 +87,16 @@ export default function FormSubmitPage({
 
                 // Format the value based on field type
                 let formattedValue = field.value;
-                
-                if (field.field_type === "text" || field.field_type === "dropdown") {
+
+                if (
+                    field.field_type === "text" ||
+                    field.field_type === "dropdown"
+                ) {
                     // Trim whitespace from text fields
-                    formattedValue = typeof field.value === "string" 
-                        ? field.value.trim() 
-                        : field.value;
+                    formattedValue =
+                        typeof field.value === "string"
+                            ? field.value.trim()
+                            : field.value;
                 } else if (field.field_type === "date") {
                     // Ensure date is in proper format
                     formattedValue = field.value;
@@ -113,7 +117,9 @@ export default function FormSubmitPage({
 
         if (validationErrors.length > 0) {
             setError(
-                `Please fill in all required fields: ${validationErrors.join(", ")}`
+                `Please fill in all required fields: ${validationErrors.join(
+                    ", "
+                )}`
             );
             return;
         }
@@ -126,14 +132,14 @@ export default function FormSubmitPage({
             };
 
             await api.post(`/forms/${formId}/submit`, submissionData);
-            
+
             // Show success message and redirect
             alert("Form submitted successfully!");
-            // router.push("/forms");
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Submission error:", err);
+            const error = err as { response?: { data?: { message?: string } } };
             setError(
-                err.response?.data?.message ||
+                error.response?.data?.message ||
                     "Failed to submit form. Please try again."
             );
         } finally {

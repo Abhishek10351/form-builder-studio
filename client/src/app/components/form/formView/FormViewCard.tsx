@@ -74,7 +74,7 @@ export default function FormCard({ formId, title, description }: FormViewProps) 
                             Delete Form?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete "{title}"? This action cannot be undone and will permanently remove the form and all its submissions.
+                            Are you sure you want to delete &ldquo;{title}&rdquo;? This action cannot be undone and will permanently remove the form and all its submissions.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

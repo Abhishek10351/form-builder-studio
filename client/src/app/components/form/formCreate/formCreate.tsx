@@ -116,7 +116,7 @@ export default function FormCreate({ formId }: { formId: string }) {
         setFields((prev) => prev.map((f) => (f.id === field.id ? field : f)));
 
         if (!field.isEditing) {
-            const { isEditing, ...updatedField } = field;
+            const { isEditing: _isEditing, ...updatedField } = field;
             ws?.send(
                 JSON.stringify({ action: "update_field", field: updatedField })
             );

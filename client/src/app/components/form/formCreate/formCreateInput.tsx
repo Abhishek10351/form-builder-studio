@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { TrashIcon, CopyIcon, XIcon, SquareIcon } from "lucide-react";
 import TextareaAutoSize from "react-textarea-autosize";
 import { Input } from "@/components/ui/input";
-import { FieldType, FormCreateInputProps, FormCreateField } from "@/types";
+import { FieldType, FormCreateInputProps } from "@/types";
 import InputTypeSelect from "./inputTypeSelect";
 
 export const RenderOptionsInput = ({
