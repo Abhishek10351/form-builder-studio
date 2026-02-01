@@ -135,7 +135,7 @@ export default function FormCreateInput({
     };
 
     return (
-        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 overflow-y-auto flex flex-col gap-4">
+        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 overflow-y-auto flex flex-col gap-4 bg-card">
             <div className="flex flex-row gap-4">
                 <TextareaAutoSize
                     placeholder="Question"

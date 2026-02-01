@@ -57,7 +57,7 @@ export default function FormViewInput({
     onFieldChange,
 }: FormViewInputProps) {
     return (
-        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 flex flex-col gap-4 relative">
+        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 flex flex-col gap-4 relative bg-card">
             <button
                 onClick={() =>
                     onFieldChange?.({ ...field, isEditing: !field.isEditing })

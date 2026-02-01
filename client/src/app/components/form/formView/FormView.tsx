@@ -69,7 +69,7 @@ export default function FormView() {
     return (
         <div className="py-24">
             <CreateFormCard />
-            <h1 className="text-3xl font-bold mb-6">Recent Forms</h1>
+            <h1 className="text-3xl font-bold mb-6 ml-4">Recent Forms</h1>
 
             {isLoading ? (
                 <LoadingState />
@@ -78,7 +78,7 @@ export default function FormView() {
             ) : forms.length === 0 ? (
                 <EmptyState />
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 px-4">
                     {forms.map((form) => (
                         <FormCard key={form.formId} {...form} />
                     ))}

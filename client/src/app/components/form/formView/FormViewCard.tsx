@@ -37,7 +37,7 @@ export default function FormCard({ formId, title, description }: FormViewProps) 
 
     return (
         <>
-            <div className="border rounded-lg p-4 shadow hover:shadow-lg transition-shadow flex flex-col justify-between">
+            <div className="border rounded-lg p-4 shadow hover:shadow-lg transition-shadow flex flex-col justify-between bg-card">
                 <h2 className="text-lg font-semibold mb-2">{title}</h2>
                 <p className="text-muted-foreground mb-4">{description}</p>
                 <div className="flex justify-end">

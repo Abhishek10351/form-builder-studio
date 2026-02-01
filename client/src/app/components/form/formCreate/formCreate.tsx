@@ -90,7 +90,8 @@ export default function FormCreate({ formId }: { formId: string }) {
         api.get(`/forms/${formId}`)
             .then(({ data }) => {
                 if (data.title !== undefined) setTitle(data.title);
-                if (data.description !== undefined) setDescription(data.description);
+                if (data.description !== undefined)
+                    setDescription(data.description);
                 if (data.published !== undefined) setPublished(data.published);
                 if (data.fields && Array.isArray(data.fields)) {
                     setFields(
@@ -107,7 +108,8 @@ export default function FormCreate({ formId }: { formId: string }) {
 
         return () => {
             if (titleTimeoutRef.current) clearTimeout(titleTimeoutRef.current);
-            if (descriptionTimeoutRef.current) clearTimeout(descriptionTimeoutRef.current);
+            if (descriptionTimeoutRef.current)
+                clearTimeout(descriptionTimeoutRef.current);
             websocket.close();
         };
     }, [formId]);
@@ -157,7 +159,7 @@ export default function FormCreate({ formId }: { formId: string }) {
     };
 
     return (
-        <div className="shadow-lg border rounded-lg w-full max-w-3xl mx-auto my-8 overflow-hidden">
+        <div className="shadow-lg border rounded-lg w-full max-w-3xl mx-auto my-8 overflow-hidden bg-background">
             <div className="bg-gradient-to-r from-blue-300 to-indigo-400 dark:from-gray-800 dark:to-gray-900 px-6 py-4 border-b flex items-center justify-between">
                 <div className="flex-1">
                     <input
@@ -181,50 +183,49 @@ export default function FormCreate({ formId }: { formId: string }) {
                 />
             </div>
             <div className="p-6">
-                <Separator className="mb-6" />
-            <div className="space-y-20">
-                {fields.map((field) =>
-                    field.isEditing ? (
-                        <FormCreateInput
-                            key={field.id}
-                            field={field}
-                            onFieldChange={handleFieldChange}
-                            onFieldDelete={(fieldId) =>
-                                ws?.send(
-                                    JSON.stringify({
-                                        action: "remove_field",
-                                        field_id: fieldId,
-                                    })
-                                )
-                            }
-                            onFieldDuplicate={(field) =>
-                                ws?.send(
-                                    JSON.stringify({
-                                        action: "duplicate_field",
-                                        field_id: field.id,
-                                    })
-                                )
-                            }
-                        />
-                    ) : (
-                        <FormViewInput
-                            key={field.id}
-                            field={field}
-                            onFieldChange={handleFieldChange}
-                        />
-                    )
-                )}
-                <Button
-                    variant="outline"
-                    className="w-full mt-6 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer"
-                    onClick={() =>
-                        ws?.send(JSON.stringify({ action: "add_field" }))
-                    }
-                >
-                    <SquarePlusIcon className="mr-2 h-5 w-5" />
-                    Add Field
-                </Button>
-            </div>
+                <div className="space-y-20">
+                    {fields.map((field) =>
+                        field.isEditing ? (
+                            <FormCreateInput
+                                key={field.id}
+                                field={field}
+                                onFieldChange={handleFieldChange}
+                                onFieldDelete={(fieldId) =>
+                                    ws?.send(
+                                        JSON.stringify({
+                                            action: "remove_field",
+                                            field_id: fieldId,
+                                        })
+                                    )
+                                }
+                                onFieldDuplicate={(field) =>
+                                    ws?.send(
+                                        JSON.stringify({
+                                            action: "duplicate_field",
+                                            field_id: field.id,
+                                        })
+                                    )
+                                }
+                            />
+                        ) : (
+                            <FormViewInput
+                                key={field.id}
+                                field={field}
+                                onFieldChange={handleFieldChange}
+                            />
+                        )
+                    )}
+                    <Button
+                        variant="outline"
+                        className="w-full mt-6 border-dashed border-2 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                        onClick={() =>
+                            ws?.send(JSON.stringify({ action: "add_field" }))
+                        }
+                    >
+                        <SquarePlusIcon className="mr-2 h-5 w-5" />
+                        Add Field
+                    </Button>
+                </div>
             </div>
         </div>
     );
