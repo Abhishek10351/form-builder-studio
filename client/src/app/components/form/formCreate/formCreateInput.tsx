@@ -85,12 +85,6 @@ export const RenderFieldInput = ({
                 />
             );
         case "checkbox":
-            return (
-                <div className="flex items-center gap-2">
-                    <SquareIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
-                    <div className="text-muted-foreground">Option</div>
-                </div>
-            );
         case "radio":
         case "dropdown":
             return (

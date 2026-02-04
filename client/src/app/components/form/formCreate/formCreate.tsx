@@ -6,7 +6,6 @@ import FormViewInput from "./formViewInput";
 import { FormCreateField } from "@/types";
 import { SquarePlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { ConfettiPublishButton } from "@/components/ui/confetti-publish-button";
 import { api } from "@/app/utils";
 
@@ -159,8 +158,8 @@ export default function FormCreate({ formId }: { formId: string }) {
     };
 
     return (
-        <div className="shadow-lg border rounded-lg w-full max-w-3xl mx-auto my-8 overflow-hidden bg-background">
-            <div className="bg-gradient-to-r from-blue-300 to-indigo-400 dark:from-gray-800 dark:to-gray-900 px-6 py-4 border-b flex items-center justify-between">
+        <div className="w-full max-w-3xl mx-auto my-8 overflow-hidden bg-background p-0 md:p-6">
+            <div className="bg-gradient-to-r from-blue-300 to-indigo-400 dark:from-gray-800 dark:to-gray-900 px-6 py-4 border-b flex items-center justify-between rounded-lg flex-col md:flex-row mb-4">
                 <div className="flex-1">
                     <input
                         type="text"
@@ -180,9 +179,10 @@ export default function FormCreate({ formId }: { formId: string }) {
                 <ConfettiPublishButton
                     published={published}
                     onClick={handlePublish}
+
                 />
             </div>
-            <div className="p-6">
+            <div className="p-0 md:p-6">
                 <div className="space-y-20">
                     {fields.map((field) =>
                         field.isEditing ? (

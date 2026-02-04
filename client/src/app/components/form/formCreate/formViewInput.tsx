@@ -6,24 +6,31 @@ import { SquareIcon, PencilIcon, CircleIcon } from "lucide-react";
 
 const RenderOptions = ({
     names,
-    showIcon,
+    fieldType,
 }: {
     names: string[];
-    showIcon?: boolean;
-}) => (
-    <ol
-        className={`flex flex-col gap-2 ${showIcon ? "" : "list-decimal pl-5"}`}
-    >
-        {names.map((name, index) => (
-            <li key={index} className="flex items-center gap-2">
-                {showIcon && (
-                    <CircleIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
-                )}
-                <span className="text-muted-foreground">{name}</span>
-            </li>
-        ))}
-    </ol>
-);
+    fieldType: "checkbox" | "radio" | "dropdown";
+}) => {
+    const isDropdown = fieldType === "dropdown";
+    const Icon = fieldType === "checkbox" ? SquareIcon : CircleIcon;
+
+    return (
+        <ol
+            className={`flex flex-col gap-2 ${
+                isDropdown ? "list-decimal pl-5" : ""
+            }`}
+        >
+            {names.map((name, index) => (
+                <li key={index} className="flex items-center gap-2">
+                    {!isDropdown && (
+                        <Icon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                    )}
+                    <span className="text-muted-foreground">{name}</span>
+                </li>
+            ))}
+        </ol>
+    );
+};
 
 const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
     switch (fieldType) {
@@ -36,16 +43,11 @@ const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
                 />
             );
         case "checkbox":
-            return (
-                <div className="flex items-center gap-2">
-                    <SquareIcon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
-                    <span className="text-muted-foreground">Option</span>
-                </div>
-            );
+            return <RenderOptions names={options || []} fieldType="checkbox" />;
         case "radio":
-            return <RenderOptions names={options || []} showIcon />;
+            return <RenderOptions names={options || []} fieldType="radio" />;
         case "dropdown":
-            return <RenderOptions names={options || []} />;
+            return <RenderOptions names={options || []} fieldType="dropdown" />;
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
