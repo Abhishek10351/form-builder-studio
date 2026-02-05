@@ -3,6 +3,7 @@
 import { MenuIcon, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
     NavigationMenu,
     NavigationMenuItem,
@@ -38,6 +39,11 @@ const Header: React.FC = () => {
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -69,35 +75,39 @@ const Header: React.FC = () => {
 
                 <div className="hidden items-center gap-4 lg:flex">
                     <ThemeToggle />
-                    {isAuthenticated ? (
-                        <div className="flex items-center gap-4">
-                            <span className="text-sm text-muted-foreground">
-                                Welcome, {user?.name || user?.email}
-                            </span>
-                            <Button
-                                variant="outline"
-                                onClick={handleLogout}
-                                className="text-foreground hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2 "
-                            >
-                                <LogOut className="h-4 w-4" />
-                                Sign out
-                            </Button>
-                        </div>
-                    ) : (
+                    {isMounted && (
                         <>
-                            <Button
-                                variant="outline"
-                                className="text-muted-foreground hover:text-primary transition-colors duration-200 cursor-pointer"
-                                asChild
-                            >
-                                <a href="/auth/login">Sign in</a>
-                            </Button>
-                            <Button
-                                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
-                                asChild
-                            >
-                                <a href="/auth/signup">Create Account</a>
-                            </Button>
+                            {isAuthenticated ? (
+                                <div className="flex items-center gap-4">
+                                    <span className="text-sm text-muted-foreground">
+                                        Welcome, {user?.name || user?.email}
+                                    </span>
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleLogout}
+                                        className="text-foreground hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2 "
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                        Sign out
+                                    </Button>
+                                </div>
+                            ) : (
+                                <>
+                                    <Button
+                                        variant="outline"
+                                        className="text-muted-foreground hover:text-primary transition-colors duration-200 cursor-pointer"
+                                        asChild
+                                    >
+                                        <Link href="/auth/login">Sign in</Link>
+                                    </Button>
+                                    <Button
+                                        className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
+                                        asChild
+                                    >
+                                        <Link href="/auth/signup">Create Account</Link>
+                                    </Button>
+                                </>
+                            )}
                         </>
                     )}
                 </div>
@@ -126,48 +136,52 @@ const Header: React.FC = () => {
                         <div className="flex flex-col p-4">
                             <div className="flex flex-col gap-6">
                                 {navigationLinks.map((link) => (
-                                    <a
+                                    <Link
                                         key={link.title}
                                         href={link.href}
                                         className="font-medium"
                                     >
                                         {link.title}
-                                    </a>
+                                    </Link>
                                 ))}
                             </div>
-                            <div className="mt-6 flex flex-col gap-4 items-st">
+                            <div className="mt-6 flex flex-col gap-4 items-start">
                                 <ThemeToggle />
-                                {isAuthenticated ? (
-                                    <div className="flex flex-col gap-4">
-                                        <span className="text-sm text-muted-foreground">
-                                            Welcome, {user?.name || user?.email}
-                                        </span>
-                                        <Button
-                                            variant="outline"
-                                            onClick={handleLogout}
-                                            className="text-muted-foreground hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2"
-                                        >
-                                            <LogOut className="h-4 w-4" />
-                                            Sign out
-                                        </Button>
-                                    </div>
-                                ) : (
+                                {isMounted && (
                                     <>
-                                        <Button
-                                            variant="outline"
-                                            className="text-muted-foreground hover:text-primary transition-colors duration-200 cursor-pointer"
-                                            asChild
-                                        >
-                                            <a href="/auth/login">Sign in</a>
-                                        </Button>
-                                        <Button
-                                            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
-                                            asChild
-                                        >
-                                            <a href="/auth/signup">
-                                                Create Account
-                                            </a>
-                                        </Button>
+                                        {isAuthenticated ? (
+                                            <div className="flex flex-col gap-4">
+                                                <span className="text-sm text-muted-foreground">
+                                                    Welcome, {user?.name || user?.email}
+                                                </span>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={handleLogout}
+                                                    className="text-muted-foreground hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2"
+                                                >
+                                                    <LogOut className="h-4 w-4" />
+                                                    Sign out
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    variant="outline"
+                                                    className="text-muted-foreground hover:text-primary transition-colors duration-200 cursor-pointer"
+                                                    asChild
+                                                >
+                                                    <Link href="/auth/login">Sign in</Link>
+                                                </Button>
+                                                <Button
+                                                    className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
+                                                    asChild
+                                                >
+                                                    <Link href="/auth/signup">
+                                                        Create Account
+                                                    </Link>
+                                                </Button>
+                                            </>
+                                        )}
                                     </>
                                 )}
                             </div>
