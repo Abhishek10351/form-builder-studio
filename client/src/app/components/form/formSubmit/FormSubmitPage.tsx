@@ -102,10 +102,12 @@ export default function FormSubmitPage({
                     formattedValue = field.value;
                 } else if (field.field_type === "checkbox") {
                     // Ensure boolean value
-                    formattedValue = Boolean(field.value);
+                    // formattedValue = Boolean(field.value);
+
                 } else if (field.field_type === "radio") {
                     // Ensure string value
                     formattedValue = String(field.value || "");
+                    
                 }
 
                 return {
@@ -148,8 +150,8 @@ export default function FormSubmitPage({
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 min-h-screen mt-24 bg-background mb-12">
-            <div className="mb-4 border-2 p-4 rounded-md">
+        <div className="max-w-2xl mx-auto p-2 md:p-6 mt-24 bg-background">
+            <div className="mb-4 border-2 p-4 rounded-md bg-card">
                 <h1 className="text-2xl font-bold text-gray-800 mb-6 dark:text-gray-100">
                     {title}
                 </h1>
@@ -162,7 +164,7 @@ export default function FormSubmitPage({
                     {error}
                 </div>
             )}
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-4 px-2 md:px-0" onSubmit={handleSubmit}>
                 {formData.map((field) => (
                     <FormField
                         key={field.id}
