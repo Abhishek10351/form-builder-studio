@@ -263,7 +263,7 @@ async def submit_form(req: Request, form_id: str, submission_data: SubmissionDat
             media_type="application/json",
         )
     submission_dict = submission_data.model_dump(by_alias=True)
-    if not check_submission_data(Form.model_validate(form), submission_dict["data"]):
+    if not check_submission_data(Form.model_validate(form), submission_data.data):
         return Response(
             content=json.dumps({"message": "Invalid submission data"}),
             status_code=400,

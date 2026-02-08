@@ -44,8 +44,8 @@ export default function FormSubmitPage({
         setFormData(updatedFormData);
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         setError(null);
 
         if (!formData || formData.length === 0) {
@@ -151,7 +151,7 @@ export default function FormSubmitPage({
 
     return (
         <div className="max-w-2xl mx-auto p-2 md:p-6 mt-24 bg-background">
-            <div className="mb-4 border-2 p-4 rounded-md bg-card">
+            <div className="mb-4 border-1 p-4 rounded-md bg-gradient-to-r from-blue-200 to-indigo-200 dark:from-gray-800 dark:to-gray-900">
                 <h1 className="text-2xl font-bold text-gray-800 mb-6 dark:text-gray-100">
                     {title}
                 </h1>
@@ -164,7 +164,7 @@ export default function FormSubmitPage({
                     {error}
                 </div>
             )}
-            <form className="flex flex-col gap-4 px-2 md:px-0" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-4 px-2 md:px-0">
                 {formData.map((field) => (
                     <FormField
                         key={field.id}
@@ -179,6 +179,7 @@ export default function FormSubmitPage({
                         type="button"
                         className="w-full cursor-pointer"
                         disabled={isSubmitting}
+                        onClick={handleSubmit}
                     >
                         {isSubmitting ? "Submitting..." : "Submit Form"}
                     </Button>

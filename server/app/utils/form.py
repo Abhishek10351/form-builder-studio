@@ -4,8 +4,6 @@ from typing import List
 
 def check_submission_data(form: Form, data: List[SubmissionField]) -> bool:
 
-    if len(form.fields) != len(data):
-        return False
     for i, j in zip(form.fields, data):
 
         if i.id != j.field_id:

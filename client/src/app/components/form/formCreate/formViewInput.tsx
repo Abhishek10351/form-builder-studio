@@ -43,11 +43,9 @@ const renderFieldInput = (fieldType: FieldType, options?: string[]) => {
                 />
             );
         case "checkbox":
-            return <RenderOptions names={options || []} fieldType="checkbox" />;
         case "radio":
-            return <RenderOptions names={options || []} fieldType="radio" />;
         case "dropdown":
-            return <RenderOptions names={options || []} fieldType="dropdown" />;
+            return <RenderOptions names={options || []} fieldType={fieldType} />;
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
         default:
@@ -59,7 +57,7 @@ export default function FormViewInput({
     onFieldChange,
 }: FormViewInputProps) {
     return (
-        <div className="border rounded-lg mb-4 mx-auto px-4 py-8 flex flex-col gap-4 relative bg-card">
+        <div className="border rounded-lg mx-auto px-4 py-8 flex flex-col gap-4 relative bg-card w-full">
             <button
                 onClick={() =>
                     onFieldChange?.({ ...field, isEditing: !field.isEditing })

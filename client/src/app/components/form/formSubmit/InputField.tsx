@@ -9,6 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { FormSubmitFieldProps } from "@/types";
 
 export default function FormSubmitField({
@@ -76,47 +77,67 @@ export default function FormSubmitField({
 
             case "radio":
                 return (
-                    <RadioGroup
-                        value={value as string | ""}
-                        onValueChange={(value) => onChange?.(value)}
-                    >
-                        {options?.map((option, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center space-x-2"
-                            >
-                                <RadioGroupItem
-                                    value={option}
-                                    id={`radio-${label}-${index}`}
-                                />
-                                <Label
-                                    htmlFor={`radio-${label}-${index}`}
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    <>
+                        <RadioGroup
+                            value={value as string | ""}
+                            onValueChange={(value) => onChange?.(value)}
+                        >
+                            {options?.map((option, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center space-x-2"
                                 >
-                                    {option}
-                                </Label>
-                            </div>
-                        ))}
-                    </RadioGroup>
+                                    <RadioGroupItem
+                                        value={option}
+                                        id={`radio-${label}-${index}`}
+                                    />
+                                    <Label
+                                        htmlFor={`radio-${label}-${index}`}
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        {option}
+                                    </Label>
+                                </div>
+                            ))}
+                        </RadioGroup>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onChange?.("")}
+                            className="cursor-pointer self-end"
+                        >
+                            Remove Selection
+                        </Button>
+                    </>
                 );
 
             case "dropdown":
                 return (
-                    <Select
-                        value={value as string | ""}
-                        onValueChange={(value) => onChange?.(value)}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder={`Select an option`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {options?.map((option, index) => (
-                                <SelectItem key={index} value={option}>
-                                    {option}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <>
+                        <Select
+                            value={value as string | ""}
+                            onValueChange={(value) => onChange?.(value)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder={`Select an option`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {options?.map((option, index) => (
+                                    <SelectItem key={index} value={option}>
+                                        {option}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onChange?.("")}
+                            className="cursor-pointer self-end"
+                        >
+                            Remove Selection
+                        </Button>
+                    </>
                 );
         }
     };
