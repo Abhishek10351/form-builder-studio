@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     MONGODB_DB_NAME: str = "form_builder_studio"
     ACCESS_TOKEN_EXPIRE_DAYS: int = 8
     FRONTEND_HOST: str = "http://localhost:3000"
-    ENVIRONMENT: Literal["local", "staging", "production"] = "local"
+    ENVIRONMENT: Literal["local", "production"] = "production"
 
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = (
         []
