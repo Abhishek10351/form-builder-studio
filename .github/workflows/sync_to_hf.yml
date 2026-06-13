@@ -26,4 +26,4 @@ jobs:
           git add .
           git commit -m "Auto-deploy server from GitHub Actions"
           
-          git push --force https://Abhishek10351:${HF_TOKEN}@huggingface.co/spaces/Abhishek10351/leaf-disease-detection main
+          git push --force https://Abhishek10351:${HF_TOKEN}@huggingface.co/spaces/Abhishek10351/form-builder main
