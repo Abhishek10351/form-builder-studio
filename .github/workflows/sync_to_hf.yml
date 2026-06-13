@@ -1,0 +1,29 @@
+name: Deploy Backend to Hugging Face
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**' 
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Push server directory to HF Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd server
+          
+          git init
+          git checkout -b main
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          
+          git add .
+          git commit -m "Auto-deploy server from GitHub Actions"
+          
+          git push --force https://Abhishek10351:${HF_TOKEN}@huggingface.co/spaces/Abhishek10351/leaf-disease-detection main
