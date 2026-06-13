@@ -1,3 +1,12 @@
+---
+title: Form Builder Studio - Backend
+emoji: 📝
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # Form Builder Studio - Backend
 
 FastAPI backend server providing secure REST APIs for the Form Builder Studio application.
