@@ -21,7 +21,6 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { logout } from "@/lib/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 interface NavigationLink {
     title: string;
@@ -74,7 +73,6 @@ const Header: React.FC = () => {
                 </NavigationMenu>
 
                 <div className="hidden items-center gap-4 lg:flex">
-                    <ThemeToggle />
                     {isMounted && (
                         <>
                             {isAuthenticated ? (
@@ -146,7 +144,6 @@ const Header: React.FC = () => {
                                 ))}
                             </div>
                             <div className="mt-6 flex flex-col gap-4 items-start">
-                                <ThemeToggle />
                                 {isMounted && (
                                     <>
                                         {isAuthenticated ? (
