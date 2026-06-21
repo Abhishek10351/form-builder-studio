@@ -23,7 +23,7 @@ const RenderOptions = ({
             {names.map((name, index) => (
                 <li key={index} className="flex items-center gap-2">
                     {!isDropdown && (
-                        <Icon className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                        <Icon className="w-4 h-4 text-gray-300" />
                     )}
                     <span className="text-muted-foreground">{name}</span>
                 </li>
