@@ -36,10 +36,17 @@ async def create_user(req: Request, user: User):
 @router.get("/me", status_code=status.HTTP_200_OK)
 @login_required
 async def get_me(req: Request):
-    user = req.state.user
-    # Convert to dict and remove password if it exists
-    user_dict = user.model_dump() if hasattr(user, "model_dump") else user
-    user_dict = user.model_dump()
-    if isinstance(user_dict, dict) and "password" in user_dict:
-        user_dict.pop("password")
-    return user_dict
+    try:
+        user = req.state.user
+        # Convert to dict and remove password if it exists
+        user_dict = user.model_dump() if hasattr(user, "model_dump") else user
+        user_dict = user.model_dump()
+        if isinstance(user_dict, dict) and "password" in user_dict:
+            user_dict.pop("password")
+        return user_dict
+    except Exception:
+        return Response(
+            status_code=500,
+            content=json.dumps({"message": "Internal server error"}),
+            media_type="application/json",
+        )
