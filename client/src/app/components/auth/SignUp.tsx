@@ -8,6 +8,8 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { signUpUser, clearError } from "@/lib/redux/slices/authSlice";
 import { useEffect, useState } from "react";
 import { validationRules, type SignUpFormData } from "@/app/utils";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+
 import Image from "next/image";
 
 const SignUp = () => {
@@ -43,7 +45,7 @@ const SignUp = () => {
     };
 
     return (
-        <section className="bg-muted h-screen">
+        <section className="bg-background h-screen">
             <div className="flex h-full items-center justify-center">
                 <div className="flex flex-col items-center gap-6 lg:justify-start">
                     {/* Logo */}
@@ -54,27 +56,33 @@ const SignUp = () => {
                             }
                             alt={"Logo"}
                             title={"Form Builder Studio"}
-                            className="h10 dark:invert"
                             width={180}
                             height={50}
                         />
                     </a>
-                    <div className="min-w-sm border-muted bg-background flex w-full max-w-sm flex-col items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
+                    <div className="min-w-sm border-muted bg-muted flex w-full max-w-sm flex-col items-center gap-y-4 rounded-box border px-6 py-8 shadow-xl ">
                         <h1 className="text-xl font-semibold">Sign Up</h1>
                         <form
                             onSubmit={handleSubmit(onSubmit)}
                             className="w-full flex flex-col gap-4"
                         >
                             {error && (
-                                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md text-sm">
-                                    {error}
-                                </div>
+                                <Alert
+                                    variant="destructive"
+                                    className="text-center"
+                                >
+                                    <AlertTitle>{error}</AlertTitle>
+                                </Alert>
                             )}
                             {signUpSuccess && (
-                                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-md text-sm">
-                                    Account created successfully! Redirecting to
-                                    login page...
-                                </div>
+                                <Alert
+                                    variant="success"
+                                    className="text-center"
+                                >
+                                    <AlertTitle>
+                                        Account created successfully!
+                                    </AlertTitle>
+                                </Alert>
                             )}
                             <div className="flex w-full flex-col gap-2">
                                 <Label htmlFor="name">Name</Label>
@@ -82,7 +90,7 @@ const SignUp = () => {
                                     id="name"
                                     type="text"
                                     placeholder="Your Name"
-                                    className="text-sm"
+                                    className="text-sm bg-background"
                                     {...register("name", validationRules.name)}
                                 />
                                 {errors.name && (
@@ -97,10 +105,10 @@ const SignUp = () => {
                                     id="email"
                                     type="email"
                                     placeholder="Email"
-                                    className="text-sm"
+                                    className="text-sm bg-background"
                                     {...register(
                                         "email",
-                                        validationRules.email
+                                        validationRules.email,
                                     )}
                                 />
                                 {errors.email && (
@@ -115,10 +123,10 @@ const SignUp = () => {
                                     id="password"
                                     type="password"
                                     placeholder="Password"
-                                    className="text-sm"
+                                    className="text-sm bg-background"
                                     {...register(
                                         "password",
-                                        validationRules.signUpPassword
+                                        validationRules.signUpPassword,
                                     )}
                                 />
                                 {errors.password && (
@@ -135,12 +143,12 @@ const SignUp = () => {
                                     id="confirmPassword"
                                     type="password"
                                     placeholder="Confirm Password"
-                                    className="text-sm"
+                                    className="text-sm bg-background"
                                     {...register(
                                         "confirmPassword",
                                         validationRules.confirmPassword(
-                                            password
-                                        )
+                                            password,
+                                        ),
                                     )}
                                 />
                                 {errors.confirmPassword && (
