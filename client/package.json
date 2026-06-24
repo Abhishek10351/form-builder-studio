@@ -36,6 +36,7 @@
         "lucide-react": "^0.542.0",
         "nanoid": "^5.1.6",
         "next": "^16.2.9",
+        "radix-ui": "^1.6.0",
         "react": "19.1.0",
         "react-day-picker": "^9.11.1",
         "react-dom": "19.1.0",
