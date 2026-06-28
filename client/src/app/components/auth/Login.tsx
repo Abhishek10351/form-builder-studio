@@ -10,9 +10,10 @@ import {
     clearError,
     fetchUserData,
 } from "@/lib/redux/slices/authSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { validationRules, type LoginFormData } from "@/app/utils";
 import { Alert, AlertTitle } from "@/components/ui/alert";
+import FormPasswordInput from "@/components/ui/password";
 
 const Login: React.FC = () => {
     const redirectRoute = "/dashboard";
@@ -94,24 +95,14 @@ const Login: React.FC = () => {
                                     </span>
                                 )}
                             </div>
-                            <div className="flex w-full flex-col gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Password"
-                                    className="text-sm bg-background"
-                                    {...register(
-                                        "password",
-                                        validationRules.loginPassword,
-                                    )}
-                                />
-                                {errors.password && (
-                                    <span className="text-red-500 text-sm">
-                                        {errors.password.message}
-                                    </span>
-                                )}
-                            </div>
+                            <FormPasswordInput
+                                name="password"
+                                label="Password"
+                                placeholder="Password"
+                                register={register}
+                                rules={validationRules.loginPassword}
+                                error={errors.password?.message}
+                            />
                             <Button
                                 type="submit"
                                 className="w-full mt-2 cursor-pointer"
