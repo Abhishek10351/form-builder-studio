@@ -8,9 +8,12 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { signUpUser, clearError } from "@/lib/redux/slices/authSlice";
 import { useEffect, useState } from "react";
 import { validationRules, type SignUpFormData } from "@/app/utils";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import FormPasswordInput from "@/components/ui/password";
 import Image from "next/image";
 
 const SignUp = () => {
+    const redirectRoute = "/auth/login";
     const router = useRouter();
     const dispatch = useAppDispatch();
     const { isLoading, error } = useAppSelector((state) => state.auth);
@@ -37,13 +40,13 @@ const SignUp = () => {
             setSignUpSuccess(true);
             // Redirect to login page after a short delay
             setTimeout(() => {
-                router.push("/auth/login");
+                router.push(redirectRoute);
             }, 2000);
         }
     };
 
     return (
-        <section className="bg-muted h-screen">
+        <section className="bg-background h-screen">
             <div className="flex h-full items-center justify-center">
                 <div className="flex flex-col items-center gap-6 lg:justify-start">
                     {/* Logo */}
@@ -54,27 +57,33 @@ const SignUp = () => {
                             }
                             alt={"Logo"}
                             title={"Form Builder Studio"}
-                            className="h10 dark:invert"
                             width={180}
                             height={50}
                         />
                     </a>
-                    <div className="min-w-sm border-muted bg-background flex w-full max-w-sm flex-col items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
+                    <div className="min-w-sm border-muted bg-muted flex w-full max-w-sm flex-col items-center gap-y-4 rounded-box border px-6 py-8 shadow-xl ">
                         <h1 className="text-xl font-semibold">Sign Up</h1>
                         <form
                             onSubmit={handleSubmit(onSubmit)}
                             className="w-full flex flex-col gap-4"
                         >
                             {error && (
-                                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md text-sm">
-                                    {error}
-                                </div>
+                                <Alert
+                                    variant="destructive"
+                                    className="text-center"
+                                >
+                                    <AlertTitle>{error}</AlertTitle>
+                                </Alert>
                             )}
                             {signUpSuccess && (
-                                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-md text-sm">
-                                    Account created successfully! Redirecting to
-                                    login page...
-                                </div>
+                                <Alert
+                                    variant="success"
+                                    className="text-center"
+                                >
+                                    <AlertTitle>
+                                        Account created successfully!
+                                    </AlertTitle>
+                                </Alert>
                             )}
                             <div className="flex w-full flex-col gap-2">
                                 <Label htmlFor="name">Name</Label>
@@ -82,7 +91,7 @@ const SignUp = () => {
                                     id="name"
                                     type="text"
                                     placeholder="Your Name"
-                                    className="text-sm"
+                                    className="text-sm bg-background"
                                     {...register("name", validationRules.name)}
                                 />
                                 {errors.name && (
@@ -97,10 +106,10 @@ const SignUp = () => {
                                     id="email"
                                     type="email"
                                     placeholder="Email"
-                                    className="text-sm"
+                                    className="text-sm bg-background"
                                     {...register(
                                         "email",
-                                        validationRules.email
+                                        validationRules.email,
                                     )}
                                 />
                                 {errors.email && (
@@ -109,46 +118,22 @@ const SignUp = () => {
                                     </span>
                                 )}
                             </div>
-                            <div className="flex w-full flex-col gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Password"
-                                    className="text-sm"
-                                    {...register(
-                                        "password",
-                                        validationRules.signUpPassword
-                                    )}
-                                />
-                                {errors.password && (
-                                    <span className="text-red-500 text-sm">
-                                        {errors.password.message}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex w-full flex-col gap-2">
-                                <Label htmlFor="confirmPassword">
-                                    Confirm Password
-                                </Label>
-                                <Input
-                                    id="confirmPassword"
-                                    type="password"
-                                    placeholder="Confirm Password"
-                                    className="text-sm"
-                                    {...register(
-                                        "confirmPassword",
-                                        validationRules.confirmPassword(
-                                            password
-                                        )
-                                    )}
-                                />
-                                {errors.confirmPassword && (
-                                    <span className="text-red-500 text-sm">
-                                        {errors.confirmPassword.message}
-                                    </span>
-                                )}
-                            </div>
+                            <FormPasswordInput
+                                name="password"
+                                label="Password"
+                                placeholder="Password"
+                                register={register}
+                                rules={validationRules?.signUpPassword}
+                                error={errors.password?.message}
+                            />
+                            <FormPasswordInput
+                                name="confirmPassword"
+                                label="Confirm Password"
+                                placeholder="Confirm Password"
+                                register={register}
+                                rules={validationRules?.confirmPassword(password, )}
+                                error={errors.confirmPassword?.message}
+                            />
                             <Button
                                 type="submit"
                                 className="w-full mt-2 cursor-pointer"
@@ -161,7 +146,7 @@ const SignUp = () => {
                     <div className="text-muted-foreground flex justify-center gap-1 text-sm">
                         <p>Already have an account?</p>
                         <a
-                            href={"/auth/login"}
+                            href={redirectRoute}
                             className="text-primary font-medium hover:underline"
                         >
                             Login

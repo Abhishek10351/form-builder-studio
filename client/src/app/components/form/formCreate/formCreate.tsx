@@ -160,20 +160,20 @@ export default function FormCreate({ formId }: { formId: string }) {
     return (
         <div className="min-h-screen flex flex-col items-center mt-20 px-2 md:px-4">
             <div className="w-full max-w-3xl mx-auto my-8 overflow-hidden bg-background p-0 md:p-6">
-                <div className="bg-gradient-to-r from-blue-300 to-indigo-400 dark:from-gray-800 dark:to-gray-900 px-2 md:px-6 py-4 border flex items-center justify-between rounded-lg flex-col md:flex-row mb-4">
+                <div className="bg-gradient-to-r from-blue-300 to-indigo-400 px-2 md:px-6 py-4 border flex items-center justify-between rounded-lg flex-col md:flex-row mb-4">
                     <div className="flex-1">
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => updateTitle(e.target.value)}
                             placeholder="Untitled Form"
-                            className="w-full text-2xl font-bold bg-transparent border-0 focus:outline-none placeholder:text-gray-400"
+                            className="w-full text-2xl font-bold bg-transparent border-0 focus:outline-none placeholder:text-foreground/60"
                         />
                         <textarea
                             value={description}
                             onChange={(e) => updateDescription(e.target.value)}
                             placeholder="Add a description to your form"
-                            className="w-full mt-2 text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-gray-400"
+                            className="w-full mt-2 text-sm bg-transparent border-0 focus:outline-none resize-none placeholder:text-muted-foreground/60"
                             rows={2}
                         />
                     </div>

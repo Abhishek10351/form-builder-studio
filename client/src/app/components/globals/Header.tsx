@@ -21,7 +21,6 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { logout } from "@/lib/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 interface NavigationLink {
     title: string;
@@ -51,7 +50,7 @@ const Header: React.FC = () => {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 bg-background/95 backdrop-blur-sm shadow-sm py-4 z-50 border-b border-border">
+        <header className="fixed top-0 left-0 right-0 bg-background backdrop-blur-sm shadow-sm py-4 z-50 border-b border-border">
             <nav className="container mx-auto px-6 flex justify-between items-center h-12">
                 <Link href="/" className="flex items-center gap-2">
                     <span className="text-lg font-semibold tracking-tighter">
@@ -64,7 +63,7 @@ const Header: React.FC = () => {
                             <NavigationMenuItem key={link.title}>
                                 <NavigationMenuLink
                                     href={link.href}
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} transition-all duration-500`}
                                 >
                                     {link.title}
                                 </NavigationMenuLink>
@@ -74,7 +73,6 @@ const Header: React.FC = () => {
                 </NavigationMenu>
 
                 <div className="hidden items-center gap-4 lg:flex">
-                    <ThemeToggle />
                     {isMounted && (
                         <>
                             {isAuthenticated ? (
@@ -85,7 +83,7 @@ const Header: React.FC = () => {
                                     <Button
                                         variant="outline"
                                         onClick={handleLogout}
-                                        className="text-foreground hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2 "
+                                        className="hover:bg-destructive text-primary-foreground hover:text-destructive-foreground transition-colors duration-200 cursor-pointer flex items-center gap-2 "
                                     >
                                         <LogOut className="h-4 w-4" />
                                         Sign out
@@ -101,7 +99,7 @@ const Header: React.FC = () => {
                                         <Link href="/auth/login">Sign in</Link>
                                     </Button>
                                     <Button
-                                        className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
+                                        className="bg-primary text-primary-foreground px-4 py-2 font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
                                         asChild
                                     >
                                         <Link href="/auth/signup">Create Account</Link>
@@ -134,19 +132,18 @@ const Header: React.FC = () => {
                             </SheetTitle>
                         </SheetHeader>
                         <div className="flex flex-col p-4">
-                            <div className="flex flex-col gap-6">
+                            <div className="flex flex-col gap-6 items-start bg-mute">
                                 {navigationLinks.map((link) => (
                                     <Link
                                         key={link.title}
                                         href={link.href}
-                                        className="font-medium"
+                                        className="font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-ring/50 rounded-sm p-2 text-sm transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1 max-w-sm"
                                     >
                                         {link.title}
                                     </Link>
                                 ))}
                             </div>
                             <div className="mt-6 flex flex-col gap-4 items-start">
-                                <ThemeToggle />
                                 {isMounted && (
                                     <>
                                         {isAuthenticated ? (
@@ -157,7 +154,7 @@ const Header: React.FC = () => {
                                                 <Button
                                                     variant="outline"
                                                     onClick={handleLogout}
-                                                    className="text-muted-foreground hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2"
+                                                    className=" hover:text-destructive transition-colors duration-200 cursor-pointer flex items-center gap-2 hover:bg-destructive focus:bg-destructive/20 focus:text-destructive/80 rounded-sm p-2"
                                                 >
                                                     <LogOut className="h-4 w-4" />
                                                     Sign out
@@ -167,13 +164,13 @@ const Header: React.FC = () => {
                                             <>
                                                 <Button
                                                     variant="outline"
-                                                    className="text-muted-foreground hover:text-primary transition-colors duration-200 cursor-pointer"
+                                                    className="text-muted-foreground hover:text-primar transition-colors duration-200 cursor-pointer"
                                                     asChild
                                                 >
                                                     <Link href="/auth/login">Sign in</Link>
                                                 </Button>
                                                 <Button
-                                                    className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
+                                                    className="bg-primary text-primary-foreground px-4 py-2 font-medium hover:bg-primary/90 transition-colors duration-200 shadow-md cursor-pointer"
                                                     asChild
                                                 >
                                                     <Link href="/auth/signup">

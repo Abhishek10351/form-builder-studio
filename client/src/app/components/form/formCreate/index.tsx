@@ -1,1 +1,1 @@
-export {default as FormCreate} from './formCreate';
+export {default as FormEditPage} from './formEdit';

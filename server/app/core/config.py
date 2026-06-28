@@ -1,5 +1,3 @@
-import secrets
-import warnings
 from typing import Annotated, Any, Literal
 
 from pydantic import (
@@ -31,7 +29,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
     # API_V1_STR: str = "/api/v1"  # Kept for future use, not applied to routes yet
-    SECRET_KEY: str = secrets.token_urlsafe(40)
+    SECRET_KEY: str = ""
     MONGODB_URI: MongoDsn = "mongodb://localhost:27017"
     MONGODB_DB_NAME: str = "form_builder_studio"
     ACCESS_TOKEN_EXPIRE_DAYS: int = 8

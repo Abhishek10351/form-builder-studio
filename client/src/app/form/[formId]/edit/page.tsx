@@ -1,4 +1,4 @@
-import { FormCreate } from "@/app/components/form";
+import { FormEditPage } from "@/app/components/form";
 
 interface GetFormPageProps {
     params: Promise<{ formId: string }>;
@@ -6,5 +6,5 @@ interface GetFormPageProps {
 
 export default async function GetFormPage({ params }: GetFormPageProps) {
     const { formId } = await params;
-    return <FormCreate formId={formId} />;
+    return <FormEditPage formId={formId} />;
 }

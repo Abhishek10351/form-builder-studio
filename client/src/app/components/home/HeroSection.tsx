@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const HeroSection = () => {
     return (
-        <section className="min-h-screen bg-gradient-to-br from-indigo-50/50 via-background to-cyan-50/30 dark:from-indigo-950/20 dark:via-background dark:to-cyan-950/10">
+        <section className="min-h-screen bg-gradient-to-br from-indigo-50/50 via-background to-cyan-50/30">
             <div className="max-w-7xl mx-auto px-8 sm:px-6 lg:px-8">
                 <div className="flex flex-col items-center justify-center min-h-screen text-center">
                     <div className="max-w-3xl">
@@ -28,7 +28,7 @@ const HeroSection = () => {
                             </Button>
                             <Button
                                 variant="outline"
-                                className="px-8 py-3 text-lg border-2 border-indigo-200 dark:border-indigo-800 text-foreground hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-indigo-950/50 dark:hover:to-purple-950/50 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300"
+                                className="px-8 py-3 text-lg border-2 border-indigo-200 text-primary-foreground hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:border-indigo-300 transition-all duration-300"
                                 asChild
                             >
                                 <Link href="/form">My Forms</Link>

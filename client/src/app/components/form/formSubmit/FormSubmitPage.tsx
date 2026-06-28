@@ -18,6 +18,10 @@ export default function FormSubmitPage({
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        resetFormData();
+    }, [fields]);
+
+    const resetFormData = () => {
         if (!fields || fields.length === 0) return;
 
         const initialFormData = fields.map((field) => ({
@@ -26,17 +30,17 @@ export default function FormSubmitPage({
                 field.field_type === "checkbox"
                     ? false
                     : field.field_type === "radio" ||
-                      field.field_type === "dropdown"
-                    ? ""
-                    : "",
+                        field.field_type === "dropdown"
+                      ? ""
+                      : "",
         }));
         setFormData(initialFormData);
-    }, [fields]);
+    };
 
     const updateFieldValue = (id: string, value: FormSubmitValue) => {
         const updatedFormData = [...formData];
         const fieldIndex = updatedFormData.findIndex(
-            (field) => field.id === id
+            (field) => field.id === id,
         );
         if (fieldIndex !== -1) {
             updatedFormData[fieldIndex].value = value;
@@ -79,7 +83,7 @@ export default function FormSubmitPage({
 
                     if (isEmpty) {
                         validationErrors.push(
-                            field.label || `Field ${field.id}`
+                            field.label || `Field ${field.id}`,
                         );
                         return null;
                     }
@@ -103,11 +107,9 @@ export default function FormSubmitPage({
                 } else if (field.field_type === "checkbox") {
                     // Ensure boolean value
                     // formattedValue = Boolean(field.value);
-
                 } else if (field.field_type === "radio") {
                     // Ensure string value
                     formattedValue = String(field.value || "");
-                    
                 }
 
                 return {
@@ -120,8 +122,8 @@ export default function FormSubmitPage({
         if (validationErrors.length > 0) {
             setError(
                 `Please fill in all required fields: ${validationErrors.join(
-                    ", "
-                )}`
+                    ", ",
+                )}`,
             );
             return;
         }
@@ -142,7 +144,7 @@ export default function FormSubmitPage({
             const error = err as { response?: { data?: { message?: string } } };
             setError(
                 error.response?.data?.message ||
-                    "Failed to submit form. Please try again."
+                    "Failed to submit form. Please try again.",
             );
         } finally {
             setIsSubmitting(false);
@@ -150,17 +152,17 @@ export default function FormSubmitPage({
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-2 md:p-6 mt-24 bg-background">
-            <div className="mb-4 border-1 p-4 rounded-md bg-gradient-to-r from-blue-200 to-indigo-200 dark:from-gray-800 dark:to-gray-900">
-                <h1 className="text-2xl font-bold text-gray-800 mb-6 dark:text-gray-100">
+        <div className="max-w-2xl mx-auto p-2 md:p-6 mt-24 bg-background border border-border rounded-md shadow-lg">
+            <div className="mb-4 border-1 p-4 rounded-md bg-gradient-to-r from-primary to-secondary">
+                <h1 className="text-2xl font-bold text-foreground mb-6">
                     {title}
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-foreground/90 mb-4">
                     {description}
                 </p>
             </div>
             {error && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
                     {error}
                 </div>
             )}
@@ -184,6 +186,13 @@ export default function FormSubmitPage({
                         {isSubmitting ? "Submitting..." : "Submit Form"}
                     </Button>
                 </div>
+                <Button
+                    type="button"
+                    className="w-full cursor-pointer mt-4"
+                    onClick={resetFormData}
+                >
+                    Reset Form
+                </Button>
             </form>
         </div>
     );

@@ -10,14 +10,17 @@ import {
     clearError,
     fetchUserData,
 } from "@/lib/redux/slices/authSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { validationRules, type LoginFormData } from "@/app/utils";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import FormPasswordInput from "@/components/ui/password";
 
 const Login: React.FC = () => {
+    const redirectRoute = "/dashboard";
     const router = useRouter();
     const dispatch = useAppDispatch();
     const { isLoading, error, isAuthenticated } = useAppSelector(
-        (state) => state.auth
+        (state) => state.auth,
     );
     const {
         register,
@@ -33,7 +36,7 @@ const Login: React.FC = () => {
     // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated) {
-            router.push("/dashboard");
+            router.push(redirectRoute);
         }
     }, [isAuthenticated, router]);
 
@@ -42,15 +45,15 @@ const Login: React.FC = () => {
 
         if (loginUser.fulfilled.match(result)) {
             await dispatch(fetchUserData());
-            setTimeout(() => router.push("/dashboard"), 1500);
+            setTimeout(() => router.push(redirectRoute), 3500);
         }
     };
 
     return (
-        <section className="bg-muted h-screen">
+        <section className="bg-background h-screen">
             <div className="flex h-full items-center justify-center">
                 <div className="flex flex-col items-center gap-6 lg:justify-start">
-                    <div className="min-w-sm border-muted bg-background flex w-full max-w-sm flex-col items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
+                    <div className="min-w-sm border-muted bg-muted flex w-full max-w-sm flex-col items-center gap-y-4 rounded-xl border px-6 py-8 shadow-md">
                         <h1 className="text-xl font-semibold">Login</h1>
                         <form
                             onSubmit={handleSubmit(onSubmit)}
@@ -58,26 +61,32 @@ const Login: React.FC = () => {
                             noValidate
                         >
                             {error && (
-                                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md text-sm">
-                                    {error}
-                                </div>
+                                <Alert
+                                    variant="destructive"
+                                    className="text-center"
+                                >
+                                    <AlertTitle>{error}</AlertTitle>
+                                </Alert>
                             )}
                             {isAuthenticated && (
-                                <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-md text-sm">
-                                    Login successful! Redirecting to
-                                    dashboard...
-                                </div>
+                                <Alert
+                                    variant="success"
+                                    className="text-center"
+                                >
+                                    <AlertTitle>Login Successful!</AlertTitle>
+                                </Alert>
                             )}
+
                             <div className="flex w-full flex-col gap-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="Email"
-                                    className="text-sm"
+                                    placeholder="abc@example.com"
+                                    className="text-sm bg-background"
                                     {...register(
                                         "email",
-                                        validationRules.email
+                                        validationRules.email,
                                     )}
                                 />
                                 {errors.email && (
@@ -86,24 +95,14 @@ const Login: React.FC = () => {
                                     </span>
                                 )}
                             </div>
-                            <div className="flex w-full flex-col gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Password"
-                                    className="text-sm"
-                                    {...register(
-                                        "password",
-                                        validationRules.loginPassword
-                                    )}
-                                />
-                                {errors.password && (
-                                    <span className="text-red-500 text-sm">
-                                        {errors.password.message}
-                                    </span>
-                                )}
-                            </div>
+                            <FormPasswordInput
+                                name="password"
+                                label="Password"
+                                placeholder="Password"
+                                register={register}
+                                rules={validationRules.loginPassword}
+                                error={errors.password?.message}
+                            />
                             <Button
                                 type="submit"
                                 className="w-full mt-2 cursor-pointer"
