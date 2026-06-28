@@ -61,25 +61,25 @@ export default function Dashboard() {
                                 </p>
                             </div>
 
-                            <div className="p-6 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
-                                <h3 className="text-lg font-medium text-green-900 dark:text-green-100 mb-2">
+                            <div className="p-6 bg- border border- rounded-lg">
+                                <h3 className="text-lg font-medium text- mb-2">
                                     Account Status
                                 </h3>
-                                <p className="text-green-700 dark:text-green-300">
+                                <p className="text-green-700">
                                     {user?.is_active ? "Active" : "Inactive"}{" "}
                                     Account
                                 </p>
-                                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                                <p className="text-sm text-green-60 mt-1">
                                     Role:{" "}
                                     {user?.is_superuser ? "Admin" : "User"}
                                 </p>
                             </div>
 
-                            <div className="p-6 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                                <h3 className="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">
+                            <div className="p-6 bg-border border border-blue-200 rounded-lg">
+                                <h3 className="text-lg font-medium text-blue-900 mb-2">
                                     Email
                                 </h3>
-                                <p className="text-blue-700 dark:text-blue-300 text-sm">
+                                <p className="text-blue-700 text-sm">
                                     {user?.email || "Not available"}
                                 </p>
                             </div>

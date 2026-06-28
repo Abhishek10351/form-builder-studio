@@ -25,9 +25,9 @@ const EmptyState = () => (
 
 const CreateFormCard = () => (
     <Link href="/form/create" className="w-36 aspect-square block ml-4 mb-8">
-        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-2 shadow hover:shadow-lg hover:border-primary transition-all aspect-square flex flex-col items-center justify-center cursor-pointer group">
-            <PlusIcon className="w-12 h-12 text-gray-400 dark:text-gray-500 group-hover:text-primary transition-colors mb-2" />
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-primary transition-colors">
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 shadow hover:shadow-lg hover:border-primary transition-all aspect-square flex flex-col items-center justify-center cursor-pointer group">
+            <PlusIcon className="w-12 h-12 text-gray-400 group-hover:text-primary transition-colors mb-2" />
+            <p className="text-sm font-medium text-gray-500 group-hover:text-primary transition-colors">
                 Create New Form
             </p>
         </div>

@@ -70,11 +70,11 @@ const NotFound: React.FC = () => {
                         <Search className="h-4 w-4" />
                         What can you do?
                     </h3>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>• Check the URL for typos</li>
-                        <li>• Go back to the previous page</li>
-                        <li>• Visit our homepage</li>
-                        <li>• Try using the navigation menu</li>
+                    <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        <li>Check the URL for typos</li>
+                        <li>Go back to the previous page</li>
+                        <li>Visit our homepage</li>
+                        <li>Try using the navigation menu</li>
                     </ul>
                 </div>
 
