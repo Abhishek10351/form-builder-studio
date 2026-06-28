@@ -8,13 +8,13 @@ const FeatureItem: React.FC<FeatureProps> = ({
     description,
     color,
 }) => (
-    <div className="group bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+    <div className="group bg-muted backdrop-blur-sm border rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105">
         <div
             className={`flex items-center justify-center h-12 rounded-2xl ${color} mb-6 group-hover:scale-110 transition-transform duration-300 aspect-square`}
         >
             {icon}
         </div>
-        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
+        <h3 className="text-xl font-bold text-primary-foreground mb-3 group-hover:text-indigo-600 transition-colors duration-300">
             {title}
         </h3>
         <p className="text-muted-foreground leading-relaxed">{description}</p>
@@ -47,7 +47,7 @@ const features: FeatureProps[] = [
 
 const FeaturesSection: React.FC = () => {
     return (
-        <section className="py-16 bg-gradient-to-br from-blue-50/40 via-background to-purple-50/40 dark:from-blue-950/10 dark:via-background dark:to-purple-950/10">
+        <section className="py-16 bg-gradient-to-br from-blue-50/40 via-background to-purple-50/40">
             <div className="container mx-auto px-6">
                 <div className="text-center">
                     <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
