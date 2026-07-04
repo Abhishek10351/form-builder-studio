@@ -3,7 +3,7 @@
 import api from "@/app/utils/api";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-
+import { toast } from "sonner"; 
 interface GalleryCardButtonProps {
     slug: string;
 }
@@ -18,6 +18,7 @@ export default function GalleryCardButton({ slug }: GalleryCardButtonProps) {
             router.push(`/form/${data.id}/edit`);
             console.log("API response:", data);
         } catch (error) {
+            toast.error("Failed to use template", {position: "top-center"});
             console.error("Error using template:", error);
         }
     };
