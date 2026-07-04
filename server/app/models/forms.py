@@ -2,18 +2,25 @@ from pydantic import BaseModel, EmailStr, Field, BeforeValidator, field_validato
 from typing import Optional, Annotated
 from bson import ObjectId
 from datetime import datetime, date
+from enum import Enum
 from utils import generate_random_id
 
 # Custom type for MongoDB ObjectId
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
+class FieldType(str, Enum):
+    TEXT = "text"
+    CHECKBOX = "checkbox"
+    RADIO = "radio"
+    DROPDOWN = "dropdown"
+    DATE = "date"
+
+
 class FormField(BaseModel):
     id: str = Field(default_factory=generate_random_id, frozen=True)
     label: str = "Untitled Question"
-    field_type: str = Field(
-        default="text", pattern=r"^(text|checkbox|radio|dropdown|date)$"
-    )
+    field_type: FieldType = Field(default=FieldType.TEXT)
     required: bool = Field(default=False)
     options: list[str] | None = None
     multi_select: bool = Field(default=False)
@@ -27,7 +34,7 @@ class FormField(BaseModel):
     #                 f"Options must be provided for field type '{values.get('field_type')}'"
     #             )
     #     return v
-    
+
     # @field_validator("multi_select", mode="before")
     # @classmethod
     # def validate_multi_select(cls, v, values):
@@ -51,7 +58,7 @@ class Form(BaseModel):
     title: str = "Untitled Form"
     description: str | None = ""
     fields: list[FormField] = Field(default_factory=list)
-    owner_id: EmailStr = Field(default = None)
+    owner_id: EmailStr = Field(default=None)
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
     published: bool = Field(default=False)
 
