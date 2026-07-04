@@ -1,0 +1,222 @@
+{
+    "customer-feedback": {
+        "title": "Customer Feedback",
+        "description": "Collect feedback from your customers.",
+        "fields": [
+            {
+                "label": "How satisfied are you with our service?",
+                "field_type": "radio",
+                "required": true,
+                "options": [
+                    "Very Satisfied",
+                    "Satisfied",
+                    "Neutral",
+                    "Dissatisfied",
+                    "Very Dissatisfied"
+                ],
+                "multi_select": false
+            },
+            {
+                "label": "What did you like the most?",
+                "field_type": "checkbox",
+                "required": false,
+                "options": [
+                    "Customer Support",
+                    "Product Quality",
+                    "Pricing",
+                    "Ease of Use"
+                ],
+                "multi_select": true
+            },
+            {
+                "label": "Additional comments",
+                "field_type": "text",
+                "required": false,
+                "options": null,
+                "multi_select": false
+            }
+        ]
+    },
+
+    "event-registration": {
+        "title": "Event Registration",
+        "description": "Register people for your event.",
+        "fields": [
+            {
+                "label": "Full Name",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Email Address",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Phone Number",
+                "field_type": "text",
+                "required": false,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Event Date",
+                "field_type": "date",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            }
+        ]
+    },
+
+    "customer-survey": {
+        "title": "Customer Survey",
+        "description": "Ask questions and collect responses.",
+        "fields": [
+            {
+                "label": "How often do you use our product?",
+                "field_type": "dropdown",
+                "required": true,
+                "options": ["Daily", "Weekly", "Monthly", "Rarely"],
+                "multi_select": false
+            },
+            {
+                "label": "Which features do you use?",
+                "field_type": "checkbox",
+                "required": false,
+                "options": [
+                    "Dashboard",
+                    "Reports",
+                    "Notifications",
+                    "Analytics"
+                ],
+                "multi_select": true
+            },
+            {
+                "label": "Suggestions",
+                "field_type": "text",
+                "required": false,
+                "options": null,
+                "multi_select": false
+            }
+        ]
+    },
+
+    "contact-form": {
+        "title": "Contact Form",
+        "description": "Let visitors send you a message.",
+        "fields": [
+            {
+                "label": "Name",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Email",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Subject",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Message",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            }
+        ]
+    },
+
+    "job-application": {
+        "title": "Job Application",
+        "description": "Collect applications from candidates.",
+        "fields": [
+            {
+                "label": "Full Name",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Email",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Position Applying For",
+                "field_type": "dropdown",
+                "required": true,
+                "options": [
+                    "Frontend Developer",
+                    "Backend Developer",
+                    "Full Stack Developer",
+                    "UI/UX Designer"
+                ],
+                "multi_select": false
+            },
+            {
+                "label": "Skills",
+                "field_type": "checkbox",
+                "required": true,
+                "options": ["Python", "JavaScript", "React", "SQL"],
+                "multi_select": true
+            }
+        ]
+    },
+
+    "order-form": {
+        "title": "Order Form",
+        "description": "Allow customers to place orders online.",
+        "fields": [
+            {
+                "label": "Customer Name",
+                "field_type": "text",
+                "required": true,
+                "options": null,
+                "multi_select": false
+            },
+            {
+                "label": "Product",
+                "field_type": "dropdown",
+                "required": true,
+                "options": ["Basic Plan", "Standard Plan", "Premium Plan"],
+                "multi_select": false
+            },
+            {
+                "label": "Add-ons",
+                "field_type": "checkbox",
+                "required": false,
+                "options": [
+                    "Gift Wrap",
+                    "Priority Delivery",
+                    "Extended Warranty"
+                ],
+                "multi_select": true
+            },
+            {
+                "label": "Delivery Date",
+                "field_type": "date",
+                "required": false,
+                "options": null,
+                "multi_select": false
+            }
+        ]
+    }
+}

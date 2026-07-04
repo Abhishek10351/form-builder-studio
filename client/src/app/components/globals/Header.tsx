@@ -29,9 +29,9 @@ interface NavigationLink {
 
 const navigationLinks: NavigationLink[] = [
     { title: "Home", href: "/" },
-    { title: "Features", href: "#" },
+    { title: "Gallery", href: "/gallery" },
     { title: "Dashboard", href: "/dashboard" },
-    { title: "Contact", href: "#" },
+    { title: "Forms", href: "/form" },
 ];
 
 const Header: React.FC = () => {

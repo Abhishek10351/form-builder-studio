@@ -23,6 +23,7 @@ from utils import (
     generate_random_id,
     ConnectionManager,
     check_submission_data,
+    get_template_form,
 )
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
@@ -192,18 +193,25 @@ class FormsListResponse(BaseModel):
 @router.get("/", response_model=list[FormsListResponse], status_code=200)
 @login_required
 async def get_forms(req: Request):
-    user: User = req.state.user
-    forms = req.app.mongodb["forms"]
-    if user and user.is_superuser:
-        cursor = forms.find()
-    else:
-        cursor = forms.find({"owner_id": user.email})
-    form_list = []
-    async for form in cursor:
-        form_list.append(
-            FormsListResponse.model_validate(form).model_dump(by_alias=True)
+    try:
+        user: User = req.state.user
+        forms = req.app.mongodb["forms"]
+        if user.is_superuser:
+            cursor = forms.find()
+        else:
+            cursor = forms.find({"owner_id": user.email})
+        form_list = []
+        async for form in cursor:
+            form_list.append(
+                FormsListResponse.model_validate(form).model_dump(by_alias=True)
+            )
+        return form_list
+    except Exception as e:
+        return Response(
+            content=json.dumps({"message": "Error fetching forms"}),
+            status_code=500,
+            media_type="application/json",
         )
-    return form_list
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -213,13 +221,43 @@ async def create_form(req: Request, form: Form):
     forms = req.app.mongodb["forms"]
     form_dict = form.model_dump(by_alias=True)
     form_dict["owner_id"] = str(user.email)
-    print("Creating form:", form_dict)
     result = await forms.insert_one(form_dict)
     return Response(
         content=Form.model_validate(form_dict).model_dump_json(),
         status_code=201,
         media_type="application/json",
     )
+
+@router.post("/{slug}/use-template", status_code=status.HTTP_201_CREATED)
+@login_required
+async def use_template(req: Request, slug: str):
+    user: User | None = req.state.user
+    try:
+        data = get_template_form(slug)
+    except ValueError as e:
+        return Response(
+            content=json.dumps({"message": str(e)}),
+            status_code=404,
+            media_type="application/json",
+        )
+    try:
+        forms = req.app.mongodb["forms"]
+        data["fields"] = [FormField(**field).model_dump(by_alias=True) for field in data["fields"]]
+        data["owner_id"] = str(user.email)
+
+        form = Form(**data)
+        result = await forms.insert_one(form.model_dump(by_alias=True))
+        return Response(
+            content=Form.model_validate(form).model_dump_json(),
+            status_code=201,
+            media_type="application/json",
+        )
+    except Exception as e:
+        return Response(
+            content=json.dumps({"message": "Error creating form from template"}),
+            status_code=500,
+            media_type="application/json",
+        )
 
 
 @router.delete("/{form_id}", status_code=status.HTTP_204_NO_CONTENT)
