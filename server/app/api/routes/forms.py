@@ -2,19 +2,15 @@ from fastapi import (
     APIRouter,
     Request,
     Response,
-    Depends,
     WebSocket,
     WebSocketException,
     WebSocketDisconnect,
-    Query,
     status,
 )
 from typing import Annotated
-from models import Form, FormField, User, Submission, SubmissionField
+from models import FormField, FormIn, Form, FormPublic, FormListItem, User
 import json
 import datetime
-from pydantic import BaseModel, Field, BeforeValidator
-from typing import Optional
 import nanoid
 from utils import (
     websocket_login_required,
@@ -22,11 +18,8 @@ from utils import (
     login_required,
     generate_random_id,
     ConnectionManager,
-    check_submission_data,
     get_template_form,
 )
-
-PyObjectId = Annotated[str, BeforeValidator(str)]
 
 manager = ConnectionManager()
 
@@ -165,15 +158,9 @@ async def get_form(req: Request, form_id: str):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
 
-    if not user:
-        form = await forms.find_one({"_id": form_id, "published": True})
-    else:
-        if user.is_superuser:
-            form = await forms.find_one({"_id": form_id})
-        else:
-            form = await forms.find_one(
-                {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
-            )
+    form = await forms.find_one(
+        {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
+    )
 
     if not form:
         return Response(
@@ -181,31 +168,25 @@ async def get_form(req: Request, form_id: str):
             status_code=404,
             media_type="application/json",
         )
-    return Form.model_validate(form).model_dump(by_alias=True)
+    return FormPublic.model_validate(form).model_dump(by_alias=True)
 
 
-class FormsListResponse(BaseModel):
-    id: str = Field(alias="_id")
-    title: str
-    description: str
-
-
-@router.get("/", response_model=list[FormsListResponse], status_code=200)
+@router.get("/", response_model=list[FormListItem], status_code=200)
 @login_required
 async def get_forms(req: Request):
     try:
         user: User = req.state.user
         forms = req.app.mongodb["forms"]
-        if user.is_superuser:
-            cursor = forms.find()
-        else:
-            cursor = forms.find({"owner_id": user.email})
-        form_list = []
-        async for form in cursor:
-            form_list.append(
-                FormsListResponse.model_validate(form).model_dump(by_alias=True)
-            )
-        return form_list
+        cursor = forms.find({"owner_id": user.email})
+        form_list = [
+            FormListItem.model_validate(form).model_dump() async for form in cursor
+        ]
+
+        return Response(
+            content=json.dumps(form_list),
+            status_code=200,
+            media_type="application/json",
+        )
     except Exception as e:
         return Response(
             content=json.dumps({"message": "Error fetching forms"}),
@@ -216,17 +197,18 @@ async def get_forms(req: Request):
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 @login_required
-async def create_form(req: Request, form: Form):
+async def create_form(req: Request, form: FormIn):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-    form_dict = form.model_dump(by_alias=True)
-    form_dict["owner_id"] = str(user.email)
-    result = await forms.insert_one(form_dict)
+    form_dict = form.model_dump()
+    new_form = Form(**form_dict, owner_id=str(user.email))
+    result = await forms.insert_one(new_form.model_dump(by_alias=True))
     return Response(
-        content=Form.model_validate(form_dict).model_dump_json(),
+        content=new_form.model_dump_json(),
         status_code=201,
         media_type="application/json",
     )
+
 
 @router.post("/{slug}/use-template", status_code=status.HTTP_201_CREATED)
 @login_required
@@ -242,10 +224,12 @@ async def use_template(req: Request, slug: str):
         )
     try:
         forms = req.app.mongodb["forms"]
-        data["fields"] = [FormField(**field).model_dump(by_alias=True) for field in data["fields"]]
-        data["owner_id"] = str(user.email)
+        data["fields"] = [
+            FormField(**field).model_dump(by_alias=True) for field in data["fields"]
+        ]
+        # TODO: update fields to automatically do this
 
-        form = Form(**data)
+        form = Form(**data, owner_id=str(user.email))
         result = await forms.insert_one(form.model_dump(by_alias=True))
         return Response(
             content=Form.model_validate(form).model_dump_json(),
@@ -272,7 +256,7 @@ async def delete_form(req: Request, form_id: str):
             status_code=404,
             media_type="application/json",
         )
-    if form["owner_id"] != user.email and not user.is_superuser:
+    if form["owner_id"] != user.email:
         return Response(
             content=json.dumps({"message": "Unauthorized"}),
             status_code=403,
@@ -280,39 +264,3 @@ async def delete_form(req: Request, form_id: str):
         )
     await forms.delete_one({"_id": form_id})
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-class SubmissionData(BaseModel):
-    id: Optional[PyObjectId] = Field(default_factory=generate_random_id, alias="_id")
-    data: list[SubmissionField] = Field(default_factory=list)
-
-
-@router.post("/{form_id}/submit", response_model=Form, status_code=200)
-async def submit_form(req: Request, form_id: str, submission_data: SubmissionData):
-
-    mongo = req.app.mongodb
-    forms = mongo["forms"]
-    submissions = mongo["submissions"]
-    form = await forms.find_one({"_id": form_id, "published": True})
-    if not form:
-        return Response(
-            content=json.dumps({"message": "Form not found or not published"}),
-            status_code=404,
-            media_type="application/json",
-        )
-    submission_dict = submission_data.model_dump(by_alias=True)
-    if not check_submission_data(Form.model_validate(form), submission_data.data):
-        return Response(
-            content=json.dumps({"message": "Invalid submission data"}),
-            status_code=400,
-            media_type="application/json",
-        )
-    submission = Submission(**submission_dict, form_id=form_id)
-    submission_dict = submission.model_dump(by_alias=True)
-
-    # result = await submissions.insert_one(submission_dict)
-    return Response(
-        content=Submission.model_validate(submission_dict).model_dump_json(),
-        status_code=200,
-        media_type="application/json",
-    )
