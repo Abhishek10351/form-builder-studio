@@ -1,86 +1,80 @@
-from pydantic import BaseModel, EmailStr, Field, BeforeValidator, field_validator
-from typing import Optional, Annotated
-from bson import ObjectId
-from datetime import datetime, date
 from enum import Enum
+from pydantic import BaseModel, Field, model_validator
 from utils import generate_random_id
-
-# Custom type for MongoDB ObjectId
-PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class FieldType(str, Enum):
     TEXT = "text"
-    CHECKBOX = "checkbox"
-    RADIO = "radio"
-    DROPDOWN = "dropdown"
     DATE = "date"
+    DROPDOWN = "dropdown"
+    RADIO = "radio"
+    CHECKBOX = "checkbox"
+    BOOLEAN = "boolean"
+
+
+NEEDS_OPTIONS = {FieldType.CHECKBOX, FieldType.RADIO, FieldType.DROPDOWN}
 
 
 class FormField(BaseModel):
-    id: str = Field(default_factory=generate_random_id, frozen=True)
-    label: str = "Untitled Question"
-    field_type: FieldType = Field(default=FieldType.TEXT)
-    required: bool = Field(default=False)
-    options: list[str] | None = None
-    multi_select: bool = Field(default=False)
+    id: str = Field(default_factory=generate_random_id)
+    label: str = Field(default="Untitled Question", min_length=1, max_length=300)
+    field_type: FieldType = FieldType.TEXT
+    required: bool = False
+    options: list[str] = Field(default_factory=list)
 
-    # @field_validator("options", mode="before")
-    # @classmethod
-    # def validate_options(cls, v, values):
-    #     if values.get("field_type") in ("checkbox", "radio", "dropdown"):
-    #         if not v or not isinstance(v, list) or len(v) == 0:
-    #             raise ValueError(
-    #                 f"Options must be provided for field type '{values.get('field_type')}'"
-    #             )
-    #     return v
-
-    # @field_validator("multi_select", mode="before")
-    # @classmethod
-    # def validate_multi_select(cls, v, values):
-    #     if values.get("field_type") != "checkbox" and len(values.get("options"))==0 and v:
-    #         raise ValueError(
-    #             f"Multi-select can only be true for 'checkox'"
-    #         )
-    #     return v
-
-    # @field_validator("field_type", mode="before")
-    # @classmethod
-    # def validate_field_type(cls, v):
-    #     allowed_types = {"text", "checkbox", "radio", "dropdown", "date"}
-    #     if v not in allowed_types:
-    #         raise ValueError(f"field_type must be one of {allowed_types}")
-    #     return v
+    @model_validator(mode="after")
+    def check_consistency(self):
+        if self.field_type in NEEDS_OPTIONS:
+            if not self.options:
+                raise ValueError(f"'{self.field_type.value}' needs at least one option")
+            if len(set(self.options)) != len(self.options):
+                raise ValueError("options must be unique")
+        else:
+            self.options = []  # text / date / boolean never have options
+        return self
 
 
-class Form(BaseModel):
-    id: str = Field(default_factory=generate_random_id, alias="_id", frozen=True)
-    title: str = "Untitled Form"
+class FormIn(BaseModel):
+    """What the client sends to create/update a form."""
+
+    title: str = Field(default="Untitled Form", max_length=200)
     description: str | None = ""
     fields: list[FormField] = Field(default_factory=list)
-    owner_id: EmailStr = Field(default=None)
-    created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
-    published: bool = Field(default=False)
+    published: bool = False
 
-    model_config = {
-        "populate_by_name": True,
-        "arbitrary_types_allowed": True,
-    }
-
-
-class SubmissionField(BaseModel):
-    field_id: str
-    value: str | list[str] | date | bool | None
+    @model_validator(mode="after")
+    def unique_field_ids(self):
+        ids = [f.id for f in self.fields]
+        if len(ids) != len(set(ids)):
+            raise ValueError("duplicate field ids")
+        return self
 
 
-class Submission(BaseModel):
-    id: Optional[PyObjectId] = Field(default_factory=generate_random_id, alias="_id")
-    form_id: str = Field()
-    data: list[SubmissionField] = Field(default_factory=list)
-    # submitted_by: EmailStr | None = None
-    # submitted_at: str
+class Form(FormIn):
+    """What's stored in Mongo."""
 
-    class Config:
-        populate_by_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+    id: str = Field(default_factory=generate_random_id, alias="_id")
+    owner_id: str
+
+    model_config = {"populate_by_name": True}
+
+
+class FormPublic(BaseModel):
+    """GET /forms/{id} — what a respondent sees. No owner_id, no submissions."""
+
+    id: str = Field(alias="_id")
+    title: str
+    description: str | None
+    fields: list[FormField]
+
+    model_config = {"populate_by_name": True}
+
+
+class FormListItem(BaseModel):
+    """Shared list view — title and description only."""
+
+    id: str = Field(alias="_id")
+    title: str
+    description: str | None
+
+    model_config = {"populate_by_name": True}
