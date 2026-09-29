@@ -4,6 +4,10 @@ from typing import Annotated, Optional
 from bson import ObjectId
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
+class UserCreate(BaseModel):
+    email: EmailStr = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w{2,4}$")
+    name: str
+    password: str
 
 
 class User(BaseModel):
