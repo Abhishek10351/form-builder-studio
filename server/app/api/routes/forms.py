@@ -168,7 +168,11 @@ async def get_form(req: Request, form_id: str):
             status_code=404,
             media_type="application/json",
         )
-    return FormPublic.model_validate(form).model_dump(by_alias=True)
+    return Response(
+        content=FormPublic.model_validate(form).model_dump_json(),
+        status_code=200,
+        media_type="application/json",
+    )
 
 
 @router.get("/", response_model=list[FormListItem], status_code=200)
@@ -177,7 +181,7 @@ async def get_forms(req: Request):
     try:
         user: User = req.state.user
         forms = req.app.mongodb["forms"]
-        cursor = forms.find({"owner_id": user.email})
+        cursor = forms.find({"owner_id": user.email}, {"_id": 1, "title": 1, "description": 1})
         form_list = [
             FormListItem.model_validate(form).model_dump() async for form in cursor
         ]
@@ -202,7 +206,8 @@ async def create_form(req: Request, form: FormIn):
     forms = req.app.mongodb["forms"]
     form_dict = form.model_dump()
     new_form = Form(**form_dict, owner_id=str(user.email))
-    result = await forms.insert_one(new_form.model_dump(by_alias=True))
+    await forms.insert_one(new_form.model_dump(by_alias=True))
+
     return Response(
         content=new_form.model_dump_json(),
         status_code=201,

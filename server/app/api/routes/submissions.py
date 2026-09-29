@@ -27,11 +27,13 @@ router = APIRouter(prefix="/submit", tags=["submissions"])
 async def submit_form(req: Request, form_id: str, submission_data: SubmissionIn):
 
     mongo = req.app.mongodb
+    user: User | None = req.state.user
     forms = mongo["forms"]
     submissions = mongo["submissions"]
-    form = Form.model_validate(
-        await forms.find_one({"_id": form_id, "published": True})
-    )
+    if user:
+        form = await forms.find_one({"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]})
+    else:
+        form = await forms.find_one({"_id": form_id, "published": True})
 
     if not form:
         return Response(
@@ -41,7 +43,7 @@ async def submit_form(req: Request, form_id: str, submission_data: SubmissionIn)
         )
 
     try:
-        clean = validate_answers(form, submission_data.answers)
+        # clean = validate_answers(form, submission_data.answers)
         submission = Submission(form_id=form_id, answers=submission_data.answers)
         submission_dict = submission.model_dump(by_alias=True)
 
