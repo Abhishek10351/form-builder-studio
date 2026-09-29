@@ -8,12 +8,17 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Skip auth for these paths
         skip_paths = ["/login", "/users/create", "/docs", "/redoc", "/openapi.json"]
+        # TODO: use a regex to match paths instead of exact matches, to allow for dynamic paths
         if request.url.path in skip_paths:
             return await call_next(request)
+        request.state.user = None
         try:
-            user = await self.get_user_from_jwt(request)
+            for i in [self.get_user_from_cookie, self.get_user_from_jwt]:
+                user =  await i(request)
+                if user:
+                    request.state.user = user
+                    break
             # Attach the user to the request state
-            request.state.user = user
         except Exception:
             request.state.user = None
 
@@ -29,6 +34,16 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return await self.get_user(payload, request)
         except Exception:
             return None
+    
+    async def get_user_from_cookie(self, request: Request) -> User | None:
+        try:
+            auth_token = request.cookies.get("access_token")
+            payload = verify_token(auth_token)
+            return await self.get_user(payload, request)
+        except Exception as e:
+            print(e)
+            return None
+
     
     async def get_user(self, payload, request: Request) -> User | None:
         try:

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Response, status
-from models import User
+from models import UserCreate, User
 from pymongo.errors import DuplicateKeyError
 from core.security import get_password_hash
 from utils import login_required
@@ -9,16 +9,14 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/create", response_model=User, status_code=status.HTTP_201_CREATED)
-async def create_user(req: Request, user: User):
+async def create_user(req: Request, user: UserCreate):
     try:
         collection = req.app.mongodb["users"]
         user.password = get_password_hash(user.password)
-        user.is_superuser = False
-        user.is_active = True
         user_dict = user.model_dump(by_alias=True, exclude={"id"})
         result = await collection.insert_one(user_dict)
-        inserted_user = await collection.find_one({"_id": result.inserted_id})
-        return User(**inserted_user)
+        user = User(**user_dict, id=str(result.inserted_id))
+        return user
     except DuplicateKeyError:
         return Response(
             status_code=400,
@@ -36,17 +34,11 @@ async def create_user(req: Request, user: User):
 @router.get("/me", status_code=status.HTTP_200_OK)
 @login_required
 async def get_me(req: Request):
-    try:
-        user = req.state.user
-        # Convert to dict and remove password if it exists
-        user_dict = user.model_dump() if hasattr(user, "model_dump") else user
-        user_dict = user.model_dump()
-        if isinstance(user_dict, dict) and "password" in user_dict:
-            user_dict.pop("password")
-        return user_dict
-    except Exception:
-        return Response(
-            status_code=500,
-            content=json.dumps({"message": "Internal server error"}),
-            media_type="application/json",
-        )
+    user = req.state.user
+    user_dict = user.model_dump()
+    user_dict.pop("password")
+    return Response(
+        status_code=200,
+        content=json.dumps(user_dict),
+        media_type="application/json",
+    )
