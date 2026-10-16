@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, time
 
 from fastapi import HTTPException
 
@@ -7,52 +7,63 @@ from models.submissions import Answer
 
 
 def validate_answers(form: Form, answers: list[Answer]) -> list[Answer]:
-    fields = {f.id: f for f in form.fields}
-    by_id = {a.field_id: a.value for a in answers}
+    fields = {field.id: field for field in form.fields}
+    answers_by_id = {answer.field_id: answer.value for answer in answers}
     errors: dict[str, str] = {}
-
-    for a in answers:
-        if a.field_id not in fields:
-            errors[a.field_id] = "unknown field"
-
     clean: list[Answer] = []
-    for f in form.fields:
-        v = by_id.get(f.id)
 
-        # required / empty check — False is a valid boolean answer, not "empty"
-        is_empty = v is None or v == "" or v == []
-        if is_empty:
-            if f.required:
-                errors[f.id] = "required"
+    for answer_id in answers_by_id.keys():
+        if answer_id not in fields:
+            errors[answer_id] = "Unknown field"
+
+    for field in form.fields:
+        value = answers_by_id.get(field.id)
+
+        if field.required and (value is None or value in ["", []]):
+            errors[field.id] = "Required"
             continue
 
-        if f.field_type == FieldType.BOOLEAN:
-            ok = isinstance(v, bool)
+        match field.field_type:
+            case FieldType.TEXT:
+                valid = isinstance(value, str)
 
-        elif f.field_type == FieldType.CHECKBOX:
-            ok = isinstance(v, list) and all(
-                isinstance(x, str) and x in f.options for x in v
-            )
+            case FieldType.TOGGLE:
+                valid = isinstance(value, bool)
 
-        elif f.field_type == FieldType.TEXT:
-            ok = isinstance(v, str) and len(v) <= 5000
+            case FieldType.DATE:
+                valid = isinstance(value, str)
+                if valid:
+                    try:
+                        value = date.fromisoformat(value).isoformat()
+                    except ValueError:
+                        valid = False
 
-        elif f.field_type == FieldType.DATE:
-            try:
-                v = date.fromisoformat(v).isoformat()
-                ok = True
-            except (TypeError, ValueError):
-                ok = False
+            case FieldType.TIME:
+                valid = isinstance(value, str)
+                if valid:
+                    try:
+                        value = time.fromisoformat(value).isoformat()
+                    except ValueError:
+                        valid = False
 
-        else:  # dropdown, radio
-            ok = isinstance(v, str) and v in f.options
+            case FieldType.DROPDOWN | FieldType.RADIO:
+                valid = isinstance(value, str) and value in field.options
 
-        if not ok:
-            errors[f.id] = "invalid value"
+            case FieldType.CHECKBOXES:
+                valid = isinstance(value, list) and all(
+                    isinstance(item, str) and item in field.options for item in value
+                )
+
+            case _:
+                valid = False
+
+        if not valid:
+            errors[field.id] = "Invalid value"
             continue
 
-        clean.append(Answer(field_id=f.id, value=v))
+        clean.append(Answer(field_id=field.id, value=value))
 
     if errors:
-        raise HTTPException(422, detail=errors)
+        raise HTTPException(status_code=422, detail=errors)
+
     return clean

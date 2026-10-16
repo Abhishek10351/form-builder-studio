@@ -43,21 +43,20 @@ async def submit_form(req: Request, form_id: str, submission_data: SubmissionIn)
         )
 
     try:
-        # clean = validate_answers(form, submission_data.answers)
-        submission = Submission(form_id=form_id, answers=submission_data.answers)
+        clean = validate_answers(Form.model_validate(form), submission_data.answers)
+        
+        submission = Submission(form_id=form_id, answers=clean)
         submission_dict = submission.model_dump(by_alias=True)
 
         result = await submissions.insert_one(submission_dict)
         return Response(
-            content=Submission.model_validate(submission_dict).model_dump_json(),
+            content=submission.model_dump_json(),
             status_code=200,
             media_type="application/json",
         )
     except HTTPException as h:
-        print(h)
-        return Response(content=json.dumps(h.detail), status_code=400)
+        raise h
     except Exception as e:
-        print(e)
         return Response(
             content=json.dumps(e),
             status_code=500,

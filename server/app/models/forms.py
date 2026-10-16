@@ -6,13 +6,15 @@ from utils import generate_random_id
 class FieldType(str, Enum):
     TEXT = "text"
     DATE = "date"
+    TIME = "time"
     DROPDOWN = "dropdown"
     RADIO = "radio"
-    CHECKBOX = "checkbox"
-    BOOLEAN = "boolean"
+    CHECKBOXES = "checkboxes"
+    TOGGLE = "toggle"
 
 
-NEEDS_OPTIONS = {FieldType.CHECKBOX, FieldType.RADIO, FieldType.DROPDOWN}
+NEEDS_OPTIONS = {FieldType.CHECKBOXES, FieldType.RADIO, FieldType.DROPDOWN}
+STRING_TYPES = {FieldType.TEXT, FieldType.DATE, FieldType.TIME}
 
 
 class FormField(BaseModel):
@@ -21,17 +23,6 @@ class FormField(BaseModel):
     field_type: FieldType = FieldType.TEXT
     required: bool = False
     options: list[str] = Field(default_factory=list)
-
-    @model_validator(mode="after")
-    def check_consistency(self):
-        if self.field_type in NEEDS_OPTIONS:
-            if not self.options:
-                raise ValueError(f"'{self.field_type.value}' needs at least one option")
-            if len(set(self.options)) != len(self.options):
-                raise ValueError("options must be unique")
-        else:
-            self.options = []  # text / date / boolean never have options
-        return self
 
 
 class FormIn(BaseModel):
