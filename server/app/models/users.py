@@ -22,3 +22,16 @@ class User(BaseModel):
         "populate_by_name": True,
         "arbitrary_types_allowed": True,
     }
+
+
+class UserPublic(BaseModel):
+    id: Optional[PyObjectId] = Field(default=None, alias="_id")
+    email: EmailStr = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w{2,4}$")
+    name: str
+    is_active: bool = Field(default=True)
+    is_superuser: bool = Field(default=False)
+
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True,
+    }
