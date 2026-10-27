@@ -1,4 +1,4 @@
-export type FieldType = "text" | "checkbox" | "radio" | "dropdown" | "date";
+export type FieldType = "text" | "checkboxes" | "radio" | "dropdown" | "date" | "time" | "toggle";
 
 export interface FormCreateField {
     id: string;

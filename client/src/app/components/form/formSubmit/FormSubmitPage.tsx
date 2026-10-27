@@ -1,11 +1,10 @@
 "use client";
 
-import FormField from "./InputField";
-import { Button } from "@/components/ui/button";
-import { FormSubmit } from "@/types";
-import { useEffect, useState } from "react";
-import { FormSubmitFieldProps, FormSubmitValue } from "@/types";
 import { api } from "@/app/utils";
+import { Button } from "@/components/ui/button";
+import { FormSubmit, FormSubmitFieldProps, FormSubmitValue } from "@/types";
+import { useEffect, useState } from "react";
+import FormField from "./InputField";
 
 export default function FormSubmitPage({
     formId,
@@ -27,8 +26,8 @@ export default function FormSubmitPage({
         const initialFormData = fields.map((field) => ({
             ...field,
             value:
-                field.field_type === "checkbox"
-                    ? false
+                field.field_type === "checkboxes"
+                    ? []
                     : field.field_type === "radio" ||
                         field.field_type === "dropdown"
                       ? ""
@@ -104,7 +103,7 @@ export default function FormSubmitPage({
                 } else if (field.field_type === "date") {
                     // Ensure date is in proper format
                     formattedValue = field.value;
-                } else if (field.field_type === "checkbox") {
+                } else if (field.field_type === "checkboxes") {
                     // Ensure boolean value
                     // formattedValue = Boolean(field.value);
                 } else if (field.field_type === "radio") {
@@ -132,12 +131,12 @@ export default function FormSubmitPage({
 
         try {
             const submissionData = {
-                data: formattedData,
+                answers: formattedData,
             };
 
-            await api.post(`/forms/${formId}/submit`, submissionData);
+            await api.post(`/submit/${formId}/`, submissionData);
 
-            // Show success message and redirect
+            //  TODO: Implement a better success message or redirect to a thank you page
             alert("Form submitted successfully!");
         } catch (err: unknown) {
             console.error("Submission error:", err);
@@ -157,9 +156,7 @@ export default function FormSubmitPage({
                 <h1 className="text-2xl font-bold text-foreground mb-6">
                     {title}
                 </h1>
-                <p className="text-sm text-foreground/90 mb-4">
-                    {description}
-                </p>
+                <p className="text-sm text-foreground/90 mb-4">{description}</p>
             </div>
             {error && (
                 <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">

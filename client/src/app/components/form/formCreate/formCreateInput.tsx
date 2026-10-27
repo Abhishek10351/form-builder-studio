@@ -84,7 +84,7 @@ export const RenderFieldInput = ({
                     placeholder="Answer"
                 />
             );
-        case "checkbox":
+        case "checkboxes":
         case "radio":
         case "dropdown":
             return (
@@ -95,6 +95,14 @@ export const RenderFieldInput = ({
             );
         case "date":
             return <Input type="date" className="disabled:border" disabled />;
+        case "time":
+            return <Input type="time" className="disabled:border" disabled />;
+        case "toggle":
+            return (
+                <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Toggle</span>
+                </div>
+            );
         default:
             return null;
     }

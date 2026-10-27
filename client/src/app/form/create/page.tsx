@@ -9,7 +9,7 @@ export default function CreateFormPage() {
 
     useEffect(() => {
         api.post("/forms/", {})
-            .then((response) => router.push(`/form/${response.data.id}/create`))
+            .then((response) => router.push(`/form/${response.data.id}/edit/`))
             .catch((error) => {
                 console.error("Failed to create form:", error);
                 alert("Failed to create form. Please try again.");

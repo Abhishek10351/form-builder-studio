@@ -1,6 +1,7 @@
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
     Select,
@@ -9,12 +10,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { FormSubmitFieldProps } from "@/types";
 
 export default function FormSubmitField({
     label,
-    field_type = "text",
+    field_type,
     required,
     options,
     value,
@@ -33,7 +33,7 @@ export default function FormSubmitField({
                     />
                 );
 
-            case "checkbox":
+            case "checkboxes":
                 return (
                     <div className="flex items-center space-x-2">
                         {options?.map((option, index) => (
@@ -46,7 +46,7 @@ export default function FormSubmitField({
                                     checked={
                                         Array.isArray(value)
                                             ? (value as string[]).includes(
-                                                  option
+                                                  option,
                                               )
                                             : false
                                     }
@@ -57,10 +57,10 @@ export default function FormSubmitField({
                                                     ? [...value, option]
                                                     : [option]
                                                 : Array.isArray(value)
-                                                ? value.filter(
-                                                      (v) => v !== option
-                                                  )
-                                                : []
+                                                  ? value.filter(
+                                                        (v) => v !== option,
+                                                    )
+                                                  : [],
                                         )
                                     }
                                 />
@@ -138,6 +138,15 @@ export default function FormSubmitField({
                             Remove Selection
                         </Button>
                     </>
+                );
+            case "time":
+                return (
+                    <Input
+                        type="time"
+                        required={required}
+                        value={value as string | ""}
+                        onChange={(e) => onChange?.(e.target.value)}
+                    />
                 );
         }
     };
