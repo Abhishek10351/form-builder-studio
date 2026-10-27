@@ -1,18 +1,17 @@
-from fastapi import APIRouter, Request, Response
-from pydantic import EmailStr, BaseModel, Field
-from datetime import timedelta
-from core.security import create_access_token, verify_password
-from core.config import settings
 import json
+from datetime import timedelta
+
+from core.config import settings
+from core.security import create_access_token, verify_password
+from fastapi import APIRouter, Request, Response
+from pydantic import BaseModel, EmailStr, Field
 
 router = APIRouter(tags=["authentication"])
 
 
 class UserAuth(BaseModel):
     email: EmailStr = Field(..., examples=["test@example.com"])
-    password: str = Field(
-        ...,
-    )
+    password: str = Field(...)
 
 
 @router.post("/login")
@@ -20,6 +19,7 @@ async def login(req: Request, user: UserAuth):
     email = user.email
     password = user.password
     users = req.app.mongodb["users"]
+
     main_user = await users.find_one({"email": email})
 
     if not email or not password:
@@ -48,15 +48,26 @@ async def login(req: Request, user: UserAuth):
         expires_delta=timedelta(days=settings.ACCESS_TOKEN_EXPIRE_DAYS),
     )
 
-
     response_data = {
         "access": access_token,
+        "message": "Login successful",
         "token_type": "bearer",
         "expires_in_days": settings.ACCESS_TOKEN_EXPIRE_DAYS,
-        "message": f"Login successful. Token expires in {settings.ACCESS_TOKEN_EXPIRE_DAYS} days.",
     }
 
-    return Response(
+    response = Response(
         content=json.dumps(response_data),
         media_type="application/json",
     )
+    # TODO: make it work with any frontend url not just localhost:3000
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        httponly=True,
+        secure=False,  # True when using HTTPS in production
+        samesite="lax",
+        path="/",
+    )
+
+    return response

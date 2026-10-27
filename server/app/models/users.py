@@ -1,9 +1,12 @@
-from pydantic import BaseModel, EmailStr, Field, BeforeValidator
-from utils import generate_random_id
 from typing import Annotated, Optional
+
 from bson import ObjectId
+from pydantic import BaseModel, BeforeValidator, EmailStr, Field
+from utils import generate_random_id
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
+
+
 class UserCreate(BaseModel):
     email: EmailStr = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w{2,4}$")
     name: str
@@ -14,7 +17,7 @@ class User(BaseModel):
     id: Optional[PyObjectId] = Field(default=None, alias="_id")
     email: EmailStr = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w{2,4}$")
     name: str
-    password: str
+    password: str = Field(...)
     is_active: bool = Field(default=True)
     is_superuser: bool = Field(default=False)
 

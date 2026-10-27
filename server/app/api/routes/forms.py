@@ -157,10 +157,12 @@ async def form_websocket_endpoint(websocket: WebSocket, form_id: str):
 async def get_form(req: Request, form_id: str):
     user: User | None = req.state.user
     forms = req.app.mongodb["forms"]
-
-    form = await forms.find_one(
-        {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
-    )
+    if user:
+        form = await forms.find_one(
+            {"_id": form_id, "$or": [{"published": True}, {"owner_id": user.email}]}
+        )
+    else:
+        form = await forms.find_one({"_id": form_id, "published": True})
 
     if not form:
         return Response(
@@ -168,8 +170,14 @@ async def get_form(req: Request, form_id: str):
             status_code=404,
             media_type="application/json",
         )
+
+    if not user:
+        form_model = FormPublic.model_validate(form)
+    else:
+        form_model = Form.model_validate(form)
+
     return Response(
-        content=FormPublic.model_validate(form).model_dump_json(),
+        content=form_model.model_dump_json(),
         status_code=200,
         media_type="application/json",
     )

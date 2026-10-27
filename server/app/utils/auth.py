@@ -1,6 +1,7 @@
 from functools import wraps
-from fastapi import Request, HTTPException, status, WebSocket
+
 from core.security import verify_token
+from fastapi import HTTPException, Request, WebSocket, status
 
 
 def login_required(func):
@@ -91,5 +92,45 @@ def has_update_permission(func):
             return
 
         return await func(websocket, form_id, *args, **kwargs)
+
+    return wrapper
+
+
+def is_form_owner(func):
+
+    @wraps
+    async def wrapper(req: Request, form_id: str, *args, **kwargs):
+        user = req.state.user
+        mongo = req.app.mongo
+        forms = mongo["forms"]
+        form = await mongo["forms"].find_one({"_id": form_id})
+        if not form:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Form not found.",
+            )
+        if not user or form.get("owner_id") != user.email:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this form.",
+            )
+        return await func(req, form_id, *args, **kwargs)
+
+    return wrapper
+
+
+def form_exists(func):
+
+    @wraps(func)
+    async def wrapper(req: Request, form_id: str, *args, **kwargs):
+        mongo = req.app.mongo
+        form = await mongo["forms"].find_one({"_id": form_id})
+        if not form:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Form not found.",
+            )
+        req.state.form = form 
+        return await func(req, form_id, *args, **kwargs)
 
     return wrapper
