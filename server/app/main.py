@@ -14,7 +14,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
+    title="Form Builder",
     lifespan=lifespan,
     openapi_url="/openapi.json",
 )

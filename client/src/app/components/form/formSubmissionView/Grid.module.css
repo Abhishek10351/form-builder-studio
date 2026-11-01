@@ -1,0 +1,19 @@
+.grid {
+    block-size: auto;
+    min-width: 100%;
+    overflow-y: hidden;
+    --rdg-color: var(--color-base-content);
+    --rdg-border-color: var(--color-base-300);
+    --rdg-summary-border-color: var(--color-base-300);
+    --rdg-background-color: var(--color-base-100);
+    --rdg-header-background-color: var(--color-base-200);
+    --rdg-header-draggable-background-color: var(--color-base-300);
+    --rdg-row-hover-background-color: var(--color-base-200);
+    --rdg-row-selected-background-color: var(--color-primary);
+    --rdg-row-selected-hover-background-color: var(--color-primary);
+    --rdg-selection-color: var(--color-primary);
+    --rdg-checkbox-focus-color: var(--color-primary);
+    --rdg-font-size: 0.875rem;
+    --rdg-cell-frozen-box-shadow: 2px 0 5px -2px
+        color-mix(in oklch, var(--color-base-content) 20%, transparent);
+}
