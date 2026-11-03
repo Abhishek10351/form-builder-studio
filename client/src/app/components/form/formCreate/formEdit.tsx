@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import api from "@/app/utils/api";
+import { api } from "@/app/utils";
 import FormCreate from "./formCreate";
 
 

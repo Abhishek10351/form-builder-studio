@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import FormCreateInput from "./formCreateInput";
-import FormViewInput from "./formViewInput";
-import { FormCreateField } from "@/types";
-import { SquarePlusIcon } from "lucide-react";
+import { api } from "@/app/utils";
 import { Button } from "@/components/ui/button";
 import { ConfettiPublishButton } from "@/components/ui/confetti-publish-button";
-import { api } from "@/app/utils";
+import { FormCreateField } from "@/types";
+import { SquarePlusIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import FormCreateInput from "./formCreateInput";
+import FormViewInput from "./formViewInput";
+// TODO: use a common variable instead of different title, description, fields, published, ws, titleTimeoutRef, descriptionTimeoutRef in different components
 
 export default function FormCreate({ formId }: { formId: string }) {
     const [title, setTitle] = useState("");
@@ -20,7 +21,7 @@ export default function FormCreate({ formId }: { formId: string }) {
 
     useEffect(() => {
         const websocket = new WebSocket(
-            `ws://127.0.0.1:8000/forms/ws/${formId}`
+            `ws://127.0.0.1:8000/forms/ws/${formId}`,
         );
 
         websocket.onerror = (error) => {
@@ -58,8 +59,8 @@ export default function FormCreate({ formId }: { formId: string }) {
                         prev.map((f) =>
                             f.id === data.field.id
                                 ? { ...data.field, isEditing: false }
-                                : f
-                        )
+                                : f,
+                        ),
                     );
                     break;
                 case "duplicate_field":
@@ -74,7 +75,7 @@ export default function FormCreate({ formId }: { formId: string }) {
                     break;
                 case "remove_field":
                     setFields((prev) =>
-                        prev.filter((f) => f.id !== data.field_id)
+                        prev.filter((f) => f.id !== data.field_id),
                     );
                     break;
                 case "publish_form":
@@ -97,12 +98,12 @@ export default function FormCreate({ formId }: { formId: string }) {
                         data.fields.map((field: FormCreateField) => ({
                             ...field,
                             isEditing: false,
-                        }))
+                        })),
                     );
                 }
             })
             .catch((error) =>
-                console.error("Error fetching form data:", error)
+                console.error("Error fetching form data:", error),
             );
 
         return () => {
@@ -119,7 +120,7 @@ export default function FormCreate({ formId }: { formId: string }) {
         if (!field.isEditing) {
             const { isEditing: _isEditing, ...updatedField } = field;
             ws?.send(
-                JSON.stringify({ action: "update_field", field: updatedField })
+                JSON.stringify({ action: "update_field", field: updatedField }),
             );
         }
     };
@@ -132,7 +133,7 @@ export default function FormCreate({ formId }: { formId: string }) {
                 JSON.stringify({
                     action: "update_form",
                     data: { title: value },
-                })
+                }),
             );
         }, 500);
     };
@@ -146,14 +147,14 @@ export default function FormCreate({ formId }: { formId: string }) {
                 JSON.stringify({
                     action: "update_form",
                     data: { description: value },
-                })
+                }),
             );
         }, 500);
     };
 
     const handlePublish = () => {
         ws?.send(
-            JSON.stringify({ action: "publish_form", published: !published })
+            JSON.stringify({ action: "publish_form", published: !published }),
         );
     };
 
@@ -194,7 +195,7 @@ export default function FormCreate({ formId }: { formId: string }) {
                                         JSON.stringify({
                                             action: "remove_field",
                                             field_id: fieldId,
-                                        })
+                                        }),
                                     )
                                 }
                                 onFieldDuplicate={(field) =>
@@ -202,7 +203,7 @@ export default function FormCreate({ formId }: { formId: string }) {
                                         JSON.stringify({
                                             action: "duplicate_field",
                                             field_id: field.id,
-                                        })
+                                        }),
                                     )
                                 }
                             />
@@ -212,7 +213,7 @@ export default function FormCreate({ formId }: { formId: string }) {
                                 field={field}
                                 onFieldChange={handleFieldChange}
                             />
-                        )
+                        ),
                     )}
                     <Button
                         variant="outline"

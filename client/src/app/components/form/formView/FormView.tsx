@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { PlusIcon } from "lucide-react";
-import api from "@/app/utils/api";
-import FormCard from "./FormViewCard";
+import { api } from "@/app/utils";
 import { FormViewProps } from "@/types";
+import { PlusIcon } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import FormCard from "./FormViewCard";
 
 const LoadingState = () => (
     <div className="flex justify-center items-center h-64">
@@ -44,18 +44,11 @@ export default function FormView() {
         api.get("/forms/")
             .then((response) => {
                 setForms(
-                    response.data.map(
-                        (form: {
-                            _id?: string;
-                            id?: string;
-                            title?: string;
-                            description?: string;
-                        }) => ({
-                            formId: form._id || form.id,
-                            title: form.title,
-                            description: form.description,
-                        })
-                    )
+					response.data.map((form: any) => ({
+						formId: form.id,
+						title: form.title,
+						description: form.description,
+					})),	
                 );
                 setError(null);
             })

@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import api from "@/app/utils/api";
+import { api } from "@/app/utils";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
 // Types
@@ -58,7 +58,7 @@ export const loginUser = createAsyncThunk(
 
             return rejectWithValue(errorMessage);
         }
-    }
+    },
 );
 
 export const signUpUser = createAsyncThunk(
@@ -73,7 +73,7 @@ export const signUpUser = createAsyncThunk(
                     .response?.data?.message || "Registration failed";
             return rejectWithValue(errorMessage);
         }
-    }
+    },
 );
 
 export const fetchUserData = createAsyncThunk(
@@ -85,10 +85,10 @@ export const fetchUserData = createAsyncThunk(
         } catch (error: unknown) {
             return rejectWithValue(
                 (error as { response?: { data?: { message?: string } } })
-                    .response?.data?.message || "Failed to fetch user data"
+                    .response?.data?.message || "Failed to fetch user data",
             );
         }
-    }
+    },
 );
 
 // Auth slice

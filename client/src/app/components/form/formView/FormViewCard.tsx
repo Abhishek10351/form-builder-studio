@@ -2,7 +2,7 @@
 
 import { EllipsisVertical } from "lucide-react";
 import Link from "next/link";
-import api from "@/app/utils/api";
+import { api } from "@/app/utils";
 import { useState } from "react";
 import {
     Menubar,
