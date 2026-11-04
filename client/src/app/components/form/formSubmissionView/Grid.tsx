@@ -5,17 +5,17 @@ import { Column, DataGrid, SortColumn } from "react-data-grid";
 import "react-data-grid/lib/styles.css";
 
 import { Input } from "@/components/ui/input";
-import { FormSubmission, FormSubmit } from "@/types/form";
+import { FormDefinition, FormSubmission } from "@/types/form";
 import styles from "./Grid.module.css";
 
 interface GridProps {
-    form: FormSubmit;
+    form: FormDefinition;
     submissions: FormSubmission[];
 }
 
 type SubmissionRow = Record<string, string>;
 
-function formatCellValue(value: FormSubmission["data"][number]["value"]) {
+function formatCellValue(value: FormSubmission["answers"][number]["value"]) {
     if (Array.isArray(value)) return value.join(", ");
     if (typeof value === "boolean") return value ? "Yes" : "No";
     if (value instanceof Date) return value.toLocaleDateString();
@@ -47,13 +47,13 @@ export default function Grid({ form, submissions }: GridProps) {
     const rows = useMemo(
         () =>
             submissions
-                .map((submission) => {
+                .map((submission: FormSubmission) => {
                     const row: SubmissionRow = {
                         id: submission.id ?? "",
                     };
 
-                    submission.data.forEach((answer) => {
-                        row[answer.fieldId] = formatCellValue(answer.value);
+                    submission.answers.forEach((answer) => {
+                        row[answer.field_id] = formatCellValue(answer.value);
                     });
 
                     return row;

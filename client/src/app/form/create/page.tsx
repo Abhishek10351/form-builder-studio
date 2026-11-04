@@ -1,6 +1,6 @@
 "use client";
 
-import api from "@/app/utils/api";
+import { api } from "@/app/utils";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
