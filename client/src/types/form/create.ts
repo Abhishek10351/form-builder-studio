@@ -1,4 +1,4 @@
-export type FieldType = "text" | "checkboxes" | "radio" | "dropdown" | "date" | "time" | "toggle";
+import type { FieldType } from "./field";
 
 export interface FormCreateField {
     id: string;

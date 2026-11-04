@@ -2,7 +2,11 @@
 
 import { api } from "@/app/utils";
 import { Button } from "@/components/ui/button";
-import { FormSubmit, FormSubmitFieldProps, FormSubmitValue } from "@/types";
+import {
+    FormDefinition,
+    FormFieldProps,
+    FormInputValue,
+} from "@/types";
 import { useEffect, useState } from "react";
 import FormField from "./InputField";
 
@@ -11,8 +15,8 @@ export default function FormSubmitPage({
     title,
     description,
     fields,
-}: FormSubmit & { formId: string }) {
-    const [formData, setFormData] = useState<FormSubmitFieldProps[]>([]);
+}: FormDefinition & { formId: string }) {
+    const [formData, setFormData] = useState<FormFieldProps[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +40,7 @@ export default function FormSubmitPage({
         setFormData(initialFormData);
     };
 
-    const updateFieldValue = (id: string, value: FormSubmitValue) => {
+    const updateFieldValue = (id: string, value: FormInputValue) => {
         const updatedFormData = [...formData];
         const fieldIndex = updatedFormData.findIndex(
             (field) => field.id === id,
@@ -168,7 +172,7 @@ export default function FormSubmitPage({
                     <FormField
                         key={field.id}
                         {...field}
-                        onChange={(value: FormSubmitValue) =>
+                        onChange={(value: FormInputValue) =>
                             updateFieldValue(field.id!, value)
                         }
                     />

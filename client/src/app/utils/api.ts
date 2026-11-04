@@ -1,4 +1,3 @@
-import { FormSubmit } from "@/types/form";
 import axios from "axios";
 import cookies from "js-cookie";
 
@@ -24,17 +23,4 @@ api.interceptors.request.use(
     },
 );
 
-// add methods inside api obj to make common api calls
-
-const getForm: (formId: string) => Promise<FormSubmit> = async (
-    formId: string,
-) => {
-    try {
-        const response = await api.get(`/forms/${formId}`);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
-export { api, getForm };
+export { api };

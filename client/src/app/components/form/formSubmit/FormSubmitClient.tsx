@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 import { api } from "@/app/utils";
 import { FormSubmitPage } from "@/app/components/form";
-import { FormSubmit } from "@/types";
+import { FormDefinition } from "@/types";
 
 export default function FormClient({ formId }: { formId: string }) {
-    const [form, setForm] = useState<FormSubmit | null>(null);
+    const [form, setForm] = useState<FormDefinition | null>(null);
 
     useEffect(() => {
         let cancelled = false;
 
         async function load() {
-            const res = await api.get<FormSubmit>(`/forms/${formId}`);
+            const res = await api.get<FormDefinition>(`/forms/${formId}`);
             if (!cancelled) setForm(res.data);
         }
 

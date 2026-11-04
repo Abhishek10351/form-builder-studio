@@ -10,16 +10,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { FormSubmitFieldProps } from "@/types";
+import { FormFieldProps } from "@/types";
 
-export default function FormSubmitField({
+export default function FormField({
     label,
     field_type,
     required,
     options,
     value,
     onChange,
-}: FormSubmitFieldProps) {
+}: FormFieldProps) {
     const renderInput = () => {
         switch (field_type) {
             case "text":

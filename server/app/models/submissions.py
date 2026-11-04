@@ -36,11 +36,12 @@ class SubmissionOut(BaseModel):
     """What's returned to the client."""
 
     id: str = Field(alias="_id")
+    form_id: str
     answers: list[Answer]
 
     @classmethod
     def from_doc(cls, s: Submission) -> "SubmissionOut":
-        return cls(id=s.id, answers=s.answers)
+        return cls(id=s.id, form_id=s.form_id, answers=s.answers)
 
 
 class SubmissionList(BaseModel):
